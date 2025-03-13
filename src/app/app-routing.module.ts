@@ -2,19 +2,13 @@ import { NgModule } from '@angular/core';
 import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 
 const routes: Routes = [
-  {
-    path: 'home',
-    loadChildren: () => import('./home/home.module').then( m => m.HomePageModule)
-  },
+ 
   {
     path: '',
-    redirectTo: 'home',
+    redirectTo: 'login',
     pathMatch: 'full'
   },
-  {
-    path: 'pages',
-    loadChildren: () => import('./pages/pages.module').then( m => m.PagesPageModule)
-  },
+  
   {
     path: 'login',
     loadChildren: () => import('./Pages/Public/login/login.module').then( m => m.LoginPageModule)
@@ -34,6 +28,10 @@ const routes: Routes = [
   {
     path: 'check-token',
     loadChildren: () => import('./Pages/Public/check-token/check-token.module').then( m => m.CheckTokenPageModule)
+  },
+  {
+    path: 'home',
+    loadChildren: () => import('./Pages/Secure/home/home.module').then( m => m.HomePageModule)
   },
 ];
 
