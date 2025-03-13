@@ -1,13 +1,80 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>home</ion-title>
-  </ion-toolbar>
-</ion-header>
-
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
+<!-- Menú lateral -->
+<ion-menu contentId="main-content">
+  <ion-header>
     <ion-toolbar>
-      <ion-title size="large">home</ion-title>
+      <ion-title>Menú</ion-title>
     </ion-toolbar>
   </ion-header>
-</ion-content>
+  <ion-content class="ion-padding">
+    <ion-button expand="full" (click)="viewMenu()">Ver Menú</ion-button>
+    <ion-button expand="full" (click)="viewSpecials()">Especiales</ion-button>
+    <ion-button expand="full" (click)="reservations()">Reservaciones</ion-button>
+    <ion-button expand="full" (click)="contactUs()">Contacto</ion-button>
+    <ion-button expand="full" (click)="aboutUs()">Sobre Nosotros</ion-button>
+  </ion-content>
+</ion-menu>
+
+<!-- Contenido principal -->
+<div class="ion-page" id="main-content">
+  <ion-header>
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-menu-button></ion-menu-button>
+      </ion-buttons>
+      <ion-title>Restaurante</ion-title>
+      <ion-buttons slot="end">
+        <!-- Botón para mostrar el menú flotante -->
+        <ion-button color="dark" (click)="toggleMenu()">
+          <ion-icon slot="icon-only" ios="person-circle-outline" md="person-circle"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
+
+  <!-- Menú flotante -->
+  <div *ngIf="menuVisible" class="menu-content">
+    <ion-list>
+      <ion-item button (click)="goToProfile()">Perfil</ion-item>
+      <ion-item button (click)="viewOrders()">Mis Órdenes</ion-item>
+      <ion-item button (click)="logout()">Cerrar Sesión</ion-item>
+    </ion-list>
+  </div>
+
+  <!-- Contenido de la página -->
+  <ion-content>
+    <ion-item>
+      <ion-label>Bienvenido a nuestro restaurante</ion-label>
+    </ion-item>
+    <ion-list-header>Preferencias</ion-list-header>
+    <ion-list [inset]="true">
+     
+    </ion-list>
+  </ion-content>
+
+  <!-- Footer siempre al final de la página -->
+  <ion-footer>
+    <ion-toolbar>
+      <ion-tabs>
+        <ion-tab-bar slot="bottom">
+          <!-- Pestaña Ver Menú -->
+          <ion-tab-button (click)="viewMenu()">
+            <ion-icon name="restaurant"></ion-icon>
+            <ion-label>Menú</ion-label>
+          </ion-tab-button>
+
+          <!-- Pestaña Reservaciones -->
+          <ion-tab-button (click)="reservations()">
+            <ion-icon name="calendar"></ion-icon>
+            <ion-label>Reservaciones</ion-label>
+          </ion-tab-button>
+
+          <!-- Pestaña Contacto -->
+          <ion-tab-button (click)="contactUs()">
+            <ion-icon name="call"></ion-icon>
+            <ion-label>Contacto</ion-label>
+          </ion-tab-button>
+        </ion-tab-bar>
+      </ion-tabs>
+    </ion-toolbar>
+  </ion-footer>
+</div>
