@@ -1,34 +1,35 @@
 <?php
 
+if ($post['accion'] == "login") {
+    $email = $post['email'];
+    $password = $post['password'];
 
-if (isset($post['accion']) && $post['accion'] == "login") {
-    $email = mysqli_real_escape_string($mysqli, $post['USAD_EMAIL']);
-    $password = mysqli_real_escape_string($mysqli, $post['USAD_PASSWORD']); // Se escapa la contraseña por seguridad
-
-    $query = "SELECT * FROM res_user WHERE USER_EMAIL = '$email'";
-    $result = mysqli_query($mysqli, $query);
+    // Verificar si el usuario existe
+    $sentencia = sprintf("SELECT * FROM res_user WHERE USER_EMAIL = '%s'", mysqli_real_escape_string($mysqli, $email));
+    $result = mysqli_query($mysqli, $sentencia);
 
     if (mysqli_num_rows($result) > 0) {
-        $row = mysqli_fetch_assoc($result);
+        $usuario = mysqli_fetch_assoc($result);
 
-        if ($password === $row['USER_PASSWORD']) {
-            $datos = array(
-                'USER_CODE' => $row['USER_CODE'],
-                'USER_NAME' => $row['USER_NAME'],
-                'USER_LASTNAME' => $row['USER_LASTNAME'],
-                'USER_EMAIL' => $row['USER_EMAIL'],
-                'ROL_CODE' => $row['ROL_CODE'],
-                'USER_DATE' => $row['USER_DATE'],
-                'BRAN_CODE' => $row['BRAN_CODE']
-            );
-        
-            // La clave debe llamarse "user_admin" para que coincida con el frontend
-            $respuesta = array("estado" => true, "user_admin" => [$datos], "mensaje" => "Inicio de sesión exitoso");
+        // Verificar la contraseña
+        if (password_verify($password, $usuario['USER_PASSWORD'])) {
+            // Devolver los datos del usuario
+            $respuesta = json_encode(array(
+                'estado' => true,
+                'mensaje' => 'Inicio de sesión exitoso.',
+                'usuario' => array(
+                    'id' => $usuario['USER_CODE'],
+                    'nombre' => $usuario['USER_NAME'],
+                    'email' => $usuario['USER_EMAIL'],
+                    'rol' => $usuario['ROL_CODE']
+                )
+            ));
         } else {
-            $respuesta = array("estado" => false, "mensaje" => "Contraseña incorrecta");
+            $respuesta = json_encode(array('estado' => false, 'mensaje' => 'Contraseña incorrecta.'));
         }
+    } else {
+        $respuesta = json_encode(array('estado' => false, 'mensaje' => 'El usuario no existe.'));
     }
+
+    echo $respuesta;
 }
-
-
-echo json_encode($respuesta);

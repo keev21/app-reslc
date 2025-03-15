@@ -8,10 +8,12 @@ header ('ContentType:application/json; charset=utf-8');
 $post= json_decode(file_get_contents("php://input"), true);
 $respuesta="";
 
-
-
-
-$post = json_decode(file_get_contents("php://input"), true);
-$respuesta = "";
-
+require_once './register.php';
 require_once './login.php';
+
+
+
+
+
+
+

@@ -24,27 +24,27 @@ export class LoginPage implements OnInit {
   ngOnInit() {}
   //----------------login-----------------------------
   login() {
+    if (!this.USAD_EMAIL || !this.USAD_PASSWORD) {
+      this.servicio.showToast('Por favor, complete todos los campos.');
+      return;
+    }
+
     let datos = {
-      accion: "login",
-      USAD_EMAIL: this.USAD_EMAIL,
-      USAD_PASSWORD: this.USAD_PASSWORD
+      accion: 'login',
+      email: this.USAD_EMAIL,
+      password: this.USAD_PASSWORD
     };
 
     this.servicio.postData(datos).subscribe((res: any) => {
       if (res.estado === true) {
-        this.servicio.createSession('USAD_CODE', res.user_admin[0].USAD_CODE);
-        this.servicio.createSession('USAD_USERNAME', res.user_admin[0].USAD_USERNAME);
-        this.servicio.createSession('USAD_ROLE', res.user_admin[0].USAD_ROLE);
-        this.servicio.createSession('ICLI_CODE', res.user_admin[0].ICLI_CODE);
-        
-        this.servicio.showToast(res.mensaje);
-        this.navCtrl.navigateRoot(['/home']);
+        // Guardar información del usuario en el almacenamiento local
+        this.servicio.createSession('user', JSON.stringify(res.usuario));
+        this.navCtrl.navigateForward('/home'); // Redirigir a la página de inicio
       } else {
         this.servicio.showToast(res.mensaje);
       }
-    }, error => {
-      this.servicio.showToast("Error en la conexión con el servidor.");
-      console.error("Error en el login:", error);
+    }, (error) => {
+      this.servicio.showToast('Error en la conexión. Intente nuevamente.');
     });
   }
 
