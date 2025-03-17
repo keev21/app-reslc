@@ -1,0 +1,40 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{ isEditing ? 'Editar Categoría' : 'Nueva Categoría' }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cancelar()">Cancelar</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <!-- Seleccionar sucursal -->
+  <ion-item>
+    <ion-label position="stacked">Sucursal:</ion-label>
+    <ion-select [(ngModel)]="selectedBranch" interface="action-sheet">
+      <ion-select-option *ngFor="let branch of branches" [value]="branch">
+        {{ branch.nombre }} - {{ branch.direccion }}
+      </ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="stacked">Nombre:</ion-label>
+    <ion-input [(ngModel)]="nombre"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="stacked">Tipo:</ion-label>
+    <ion-input [(ngModel)]="tipo"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="stacked">Estado:</ion-label>
+    <ion-select [(ngModel)]="estado">
+      <ion-select-option value="0">Activo</ion-select-option>
+      <ion-select-option value="1">Inactivo</ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <ion-button expand="full" (click)="guardar()">Guardar</ion-button>
+</ion-content>

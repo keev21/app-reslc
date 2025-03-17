@@ -7,7 +7,11 @@ const routes: Routes = [
   {
     path: '',
     component: AdminCategoriesPage
+  },  {
+    path: 'category-modal',
+    loadChildren: () => import('./category-modal/category-modal.module').then( m => m.CategoryModalPageModule)
   }
+
 ];
 
 @NgModule({

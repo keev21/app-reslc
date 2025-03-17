@@ -51,7 +51,7 @@ export class LoginPage implements OnInit {
 
   passwordRecovery() {
 
-    this.navCtrl.navigateForward('password-recovery');
+    this.navCtrl.navigateForward('admin-categories');
   }
   //DIRECIONANDO AL FORMULARIO DE USER-REGISTER
   createUser() {
