@@ -11,6 +11,7 @@ $respuesta="";
 require_once './register.php';
 require_once './login.php';
 require_once './category.php';
+require_once './table.php';
 
 
 

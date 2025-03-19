@@ -89,6 +89,10 @@ const routes: Routes = [
     path: 'admin-booking',
     loadChildren: () => import('./Pages/Secure/Admin/admin-booking/admin-booking.module').then( m => m.AdminBookingPageModule)
   },
+  {
+    path: 'admin-tables',
+    loadChildren: () => import('./Pages/Secure/Admin/admin-tables/admin-tables.module').then( m => m.AdminTablesPageModule)
+  },
  
 ];
 
