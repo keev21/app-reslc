@@ -39,15 +39,20 @@ export class LoginPage implements OnInit {
       if (res.estado === true) {
         // Guardar información del usuario en el almacenamiento local
         this.servicio.createSession('user', JSON.stringify(res.usuario));
-        this.navCtrl.navigateForward('/home'); // Redirigir a la página de inicio
+        
+        // Guardar datos individuales
+        this.servicio.createSession('USER_CODE', res.usuario.id);
+        this.servicio.createSession('BRAN_CODE', res.usuario.branch);
+        this.servicio.createSession('ROL_CODE', res.usuario.rol); // Nuevo: Guardar el rol
+       
+        this.navCtrl.navigateRoot(['/home']);
       } else {
         this.servicio.showToast(res.mensaje);
       }
     }, (error) => {
       this.servicio.showToast('Error en la conexión. Intente nuevamente.');
     });
-  }
-
+}
 
   passwordRecovery() {
 

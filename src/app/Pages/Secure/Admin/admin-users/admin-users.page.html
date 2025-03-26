@@ -1,13 +1,38 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>admin-users</ion-title>
+    <ion-title>Administrar Usuarios</ion-title>
+    <ion-buttons slot="start">
+      <ion-button (click)="back()">Atrás</ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
+<ion-fab horizontal="end" vertical="bottom" slot="fixed">
+  <ion-fab-button (click)="openUserModal()">
+    <ion-icon name="add"></ion-icon>
+  </ion-fab-button>
+</ion-fab>
+
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">admin-users</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <!-- Buscador -->
+  <ion-searchbar [(ngModel)]="busqueda" (ionChange)="buscarUsuarios()" placeholder="Buscar por nombre o apellido"></ion-searchbar>
+
+  <!-- Lista de usuarios -->
+  <ion-list>
+    <ion-list-header>
+      <ion-label>Usuarios</ion-label>
+    </ion-list-header>
+    <ion-item *ngFor="let usuario of usuarios">
+      <ion-label>
+        <h2>{{ usuario.nombre }} {{ usuario.apellido }}</h2>
+        <p>{{ usuario.email }}</p>
+        <p>{{ usuario.telefono }}</p>
+        <p>{{ usuario.tipo_rol }}</p>
+        
+
+      </ion-label>
+      <ion-button fill="clear" color="warning" (click)="openUserModal(usuario)">Editar</ion-button>
+      <ion-button fill="clear" color="danger" (click)="deleteUser(usuario.id)">Eliminar</ion-button>
+    </ion-item>
+  </ion-list>
 </ion-content>

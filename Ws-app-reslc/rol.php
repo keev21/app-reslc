@@ -1,6 +1,4 @@
 <?php
-
-
 // Cargar roles
 if ($post['accion'] == "cargarRoles") {
     $sentencia = "SELECT ROL_CODE as id, ROL_TYPE as tipo, ROL_STATUS as estado FROM res_rol";

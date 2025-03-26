@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import {AuthService} from '../../../Services/auth.service';
 
 @Component({
   selector: 'app-home',
@@ -9,11 +10,30 @@ import { Component, OnInit } from '@angular/core';
 export class HomePage implements OnInit {
   menuVisible: boolean = false;
   darkModeToggle: boolean = false;
+  rol: string = '';
+  branch: string = '';
+  user: string = '';
 
-  constructor() { }
+  constructor(
+    public servicio: AuthService
+
+  ) 
+  { 
+    this.servicio.getSession('ROL_CODE').then((res: any) => {
+      this.rol = res;
+      console.log('Rol:', this.rol);
+    });
+    this.servicio.getSession('BRAN_CODE').then((res: any) => {
+      this.branch = res;
+      console.log('Branch:', this.branch);
+    });
+    this.servicio.getSession('USER_CODE').then((res: any) => {
+      this.user = res;
+      console.log('User:', this.user);
+    });
+  }
 
   ngOnInit() {
-    this.loadDarkModePreference();
   }
 
   toggleMenu() {
@@ -58,11 +78,5 @@ export class HomePage implements OnInit {
     localStorage.setItem('darkMode', JSON.stringify(this.darkModeToggle));
   }
 
-  loadDarkModePreference() {
-    const savedDarkMode = localStorage.getItem('darkMode');
-    if (savedDarkMode) {
-      this.darkModeToggle = JSON.parse(savedDarkMode);
-      document.body.classList.toggle('dark', this.darkModeToggle);
-    }
-  }
+ 
 }

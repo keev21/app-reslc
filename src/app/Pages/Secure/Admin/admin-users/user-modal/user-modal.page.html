@@ -1,0 +1,67 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>{{ isEditing ? 'Editar Usuario' : 'Nuevo Usuario' }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="cancelar()">Cancelar</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-item>
+    <ion-label position="stacked">Nombre:</ion-label>
+    <ion-input [(ngModel)]="nombre"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="stacked">Apellido:</ion-label>
+    <ion-input [(ngModel)]="apellido"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="stacked">Email:</ion-label>
+    <ion-input type="email" [(ngModel)]="email"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="stacked">Teléfono:</ion-label>
+    <ion-input type="tel" [(ngModel)]="telefono"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="stacked">Dirección:</ion-label>
+    <ion-input [(ngModel)]="direccion"></ion-input>
+  </ion-item>
+
+  <!-- Campo de contraseña con icono de ojo -->
+  <ion-item>
+    <ion-label position="stacked">Contraseña:</ion-label>
+    <ion-input [type]="mostrarPassword ? 'text' : 'password'" [(ngModel)]="password"></ion-input>
+    <ion-icon
+      slot="end"
+      [name]="mostrarPassword ? 'eye-off' : 'eye'"
+      (click)="mostrarPassword = !mostrarPassword"
+      style="cursor: pointer;"
+    ></ion-icon>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="stacked">Rol:</ion-label>
+    <ion-select [(ngModel)]="rol">
+      <ion-select-option *ngFor="let role of roles" [value]="role.id">
+        {{ role.tipo }}
+      </ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="stacked">Sucursal:</ion-label>
+    <ion-select [(ngModel)]="sucursal">
+      <ion-select-option *ngFor="let branch of sucursales" [value]="branch.id">
+        {{ branch.nombre }} - {{ branch.direccion }}
+      </ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <ion-button expand="full" (click)="guardar()">Guardar</ion-button>
+</ion-content>
