@@ -7,32 +7,55 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-fab horizontal="end" vertical="bottom" slot="fixed">
-  <ion-fab-button (click)="openUserModal()">
-    <ion-icon name="add"></ion-icon>
-  </ion-fab-button>
-</ion-fab>
-
 <ion-content [fullscreen]="true">
+  <!-- Segmento para cambiar entre empleados y clientes -->
+  <ion-segment value="empleados" (ionChange)="segmentChanged($event)">
+    <ion-segment-button value="empleados">
+      <ion-label>Empleados</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="clientes">
+      <ion-label>Clientes</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
   <!-- Buscador -->
-  <ion-searchbar [(ngModel)]="busqueda" (ionChange)="buscarUsuarios()" placeholder="Buscar por nombre o apellido"></ion-searchbar>
+  <ion-searchbar 
+    [(ngModel)]="busqueda" 
+    (ionChange)="buscarUsuarios()" 
+    placeholder="Buscar por nombre o apellido">
+  </ion-searchbar>
 
   <!-- Lista de usuarios -->
   <ion-list>
     <ion-list-header>
-      <ion-label>Usuarios</ion-label>
+      <ion-label>{{segmento === 'empleados' ? 'Empleados' : 'Clientes'}}</ion-label>
     </ion-list-header>
+
     <ion-item *ngFor="let usuario of usuarios">
       <ion-label>
         <h2>{{ usuario.nombre }} {{ usuario.apellido }}</h2>
-        <p>{{ usuario.email }}</p>
+        <p>{{ usuario.email || 'No tiene email' }}</p>
         <p>{{ usuario.telefono }}</p>
-        <p>{{ usuario.tipo_rol }}</p>
-        
-
+        <p>{{ usuario.id_info }}</p>
+        <p>{{ usuario.usuario.id }}</p>
+       
+        <p *ngIf="segmento === 'empleados'">Rol: {{ usuario.tipo_rol || 'Sin rol asignado' }}</p>
       </ion-label>
-      <ion-button fill="clear" color="warning" (click)="openUserModal(usuario)">Editar</ion-button>
-      <ion-button fill="clear" color="danger" (click)="deleteUser(usuario.id)">Eliminar</ion-button>
+      
+      <ion-button fill="clear" color="warning" (click)="openUserModal(usuario)">
+        <ion-icon name="create-outline"></ion-icon>
+      </ion-button>
+      
+      <ion-button fill="clear" color="danger" (click)="deleteUser(usuario.id, segmento === 'empleados')">
+        <ion-icon name="trash-outline"></ion-icon>
+      </ion-button>
     </ion-item>
   </ion-list>
+
+  <!-- Botón flotante para agregar -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="openUserModal()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>

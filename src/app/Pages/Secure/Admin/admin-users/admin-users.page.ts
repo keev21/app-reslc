@@ -17,46 +17,52 @@ export class AdminUsersPage implements OnInit {
   rol: string = '';
   branch: string = '';
   user: string = '';
+  segmento: string = 'empleados'; // 'empleados' o 'clientes'
 
   constructor(
     public navCtrl: NavController,
     public authService: AuthService,
     private alertController: AlertController,
     private modalCtrl: ModalController
-  ) 
-  {
+  ) {
     this.authService.getSession('ROL_CODE').then((res: any) => {
-      this.rol = res;
+      this.rol = res || '';
       console.log('Rol:', this.rol);
     });
     this.authService.getSession('BRAN_CODE').then((res: any) => {
-      this.branch = res;
+      this.branch = res || '';
+      this.loadUsers(); 
       console.log('Branch:', this.branch);
     });
-    this.authService.getSession('USER_CODE').then((res: any) => {
-      this.user = res;
-      console.log('User:', this.user);
-    });
-
+    
   }
 
   ngOnInit() {
-    this.loadUsers(); // Cargar usuarios al iniciar
+   // Cargar usuarios al iniciar
   }
 
-  // Cargar usuarios
+  // Cargar usuarios según el segmento seleccionado
   loadUsers() {
     let datos = {
-      accion: 'cargarUsuarios',
-      busqueda: this.busqueda
+      accion: this.segmento === 'empleados' ? 'cargarEmpleados' : 'cargarClientes',
+      busqueda: this.busqueda,
+      branch: this.branch // Enviamos la sucursal actual
     };
+
     this.authService.postData(datos).subscribe((res: any) => {
       if (res.estado === true) {
         this.usuarios = res.usuarios;
       } else {
         this.authService.showToast(res.mensaje);
+        this.usuarios = [];
       }
     });
+  }
+
+  // Cambiar entre empleados y clientes
+  segmentChanged(event: any) {
+    this.segmento = event.detail.value;
+    this.loadUsers();
   }
 
   // Buscar usuarios
@@ -67,60 +73,61 @@ export class AdminUsersPage implements OnInit {
   // Abrir modal para agregar/editar usuario
   async openUserModal(usuario: any = null) {
     if (usuario) {
-      this.authService.createSession('USER_CODE', usuario.id); // Guardar el ID del usuario si se está editando
+      await this.authService.createSession('USER_CODE', usuario.id);// esto sirve para empleados
+
+      await this.authService.createSession('INFO_CODE', usuario.rol);//esto sirve para cliente y empleados
+
     } else {
-      this.authService.createSession('USER_CODE', ''); // Limpiar el ID si es un nuevo usuario
+      await this.authService.createSession('USER_CODE', '');
     }
 
     const modal = await this.modalCtrl.create({
       component: UserModalPage,
+      componentProps: {
+        esEmpleado: this.segmento === 'empleados'
+      }
     });
 
     modal.onDidDismiss().then(() => {
-      this.loadUsers(); // Recargar usuarios después de cerrar el modal
+      this.loadUsers();
     });
 
     await modal.present();
   }
 
   // Eliminar usuario con confirmación
-  async deleteUser(userId: string) {
+  async deleteUser(userId: string, esEmpleado: boolean) {
     const alert = await this.alertController.create({
       header: 'Confirmar eliminación',
-      message: '¿Estás seguro de que deseas eliminar este usuario?',
+      message: `¿Estás seguro de que deseas eliminar este ${esEmpleado ? 'empleado' : 'cliente'}?`,
       buttons: [
         {
           text: 'Cancelar',
-          role: 'cancel',
-          handler: () => {
-            console.log('Eliminación cancelada');
-          }
+          role: 'cancel'
         },
         {
           text: 'Eliminar',
           handler: () => {
-            this.confirmDelete(userId); // Llamar a la función de eliminación
+            this.confirmDelete(userId, esEmpleado);
           }
         }
       ]
     });
 
-    await alert.present(); // Mostrar la alerta
+    await alert.present();
   }
 
   // Confirmar eliminación del usuario
-  confirmDelete(userId: string) {
+  confirmDelete(userId: string, esEmpleado: boolean) {
     let datos = {
-      accion: 'eliminarUsuario',
+      accion: esEmpleado ? 'eliminarEmpleado' : 'eliminarCliente',
       id: userId
     };
 
     this.authService.postData(datos).subscribe((res: any) => {
-      if (res.estado === true) {
-        this.authService.showToast('Usuario eliminado correctamente.');
-        this.loadUsers(); // Recargar la lista de usuarios
-      } else {
-        this.authService.showToast(res.mensaje);
+      this.authService.showToast(res.mensaje);
+      if (res.estado) {
+        this.loadUsers();
       }
     });
   }
