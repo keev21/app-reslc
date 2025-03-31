@@ -13,7 +13,7 @@ export class RoleModalPage implements OnInit {
   roleId: string = ''; // ID del rol (si se está editando)
   tipo: string = ''; // Tipo de rol
   estado: number = 0; // Estado del rol (0 = Activo, 1 = Inactivo)
-  isEditing: boolean = false; // Indica si se está editandos
+  isEditing: boolean = false; // Indica si se está editandoss
 
   constructor(
     private navCtrl: NavController,
