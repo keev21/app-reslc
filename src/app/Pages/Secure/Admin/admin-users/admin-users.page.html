@@ -9,7 +9,7 @@
 
 <ion-content [fullscreen]="true">
   <!-- Segmento para cambiar entre empleados y clientes -->
-  <ion-segment value="empleados" (ionChange)="segmentChanged($event)">
+  <ion-segment [(ngModel)]="segmento" (ionChange)="segmentChanged($event)">
     <ion-segment-button value="empleados">
       <ion-label>Empleados</ion-label>
     </ion-segment-button>
@@ -34,11 +34,9 @@
     <ion-item *ngFor="let usuario of usuarios">
       <ion-label>
         <h2>{{ usuario.nombre }} {{ usuario.apellido }}</h2>
-        <p>{{ usuario.email || 'No tiene email' }}</p>
+        <p>{{ usuario.email || '' }}</p>
         <p>{{ usuario.telefono }}</p>
-        <p>{{ usuario.id_info }}</p>
-        <p>{{ usuario.usuario.id }}</p>
-       
+        <p *ngIf="segmento === 'empleados'">Sucursal: {{ usuario.branch }}</p>
         <p *ngIf="segmento === 'empleados'">Rol: {{ usuario.tipo_rol || 'Sin rol asignado' }}</p>
       </ion-label>
       
@@ -46,7 +44,7 @@
         <ion-icon name="create-outline"></ion-icon>
       </ion-button>
       
-      <ion-button fill="clear" color="danger" (click)="deleteUser(usuario.id, segmento === 'empleados')">
+      <ion-button fill="clear" color="danger" (click)="deleteUser(usuario)">
         <ion-icon name="trash-outline"></ion-icon>
       </ion-button>
     </ion-item>
