@@ -1,0 +1,82 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button (click)="back()" defaultHref=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ codigo ? 'Editar Producto' : 'Nuevo Producto' }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">{{ codigo ? 'Editar Producto' : 'Nuevo Producto' }}</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <!-- Campos para ingresar los datos del producto -->
+  <ion-item>
+    <ion-label position="stacked" class="bold-label">Nombre:</ion-label>
+    <ion-input type="text" [(ngModel)]="nombre"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="stacked" class="bold-label">Tipo:</ion-label>
+    <ion-select [(ngModel)]="tipo">
+      <ion-select-option value="1">Producto</ion-select-option>
+      <ion-select-option value="0">Servicio</ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="stacked" class="bold-label">IVA (%):</ion-label>
+    <ion-input type="number" [(ngModel)]="iva"></ion-input>
+  </ion-item>
+
+  <!-- Imagen -->
+<ion-item>
+  <ion-label position="stacked" class="bold-label">Imagen:</ion-label>
+  <input type="file" (change)="onFileChange($event)" accept="image/*" hidden #fileInput>
+  <ion-button fill="clear" (click)="fileInput.click()">
+    <ion-icon name="image" slot="start"></ion-icon>
+    Seleccionar Imagen
+  </ion-button>
+</ion-item>
+
+<!-- Vista previa de la imagen -->
+<ion-item *ngIf="imagenPrevia || imagen">
+  <ion-thumbnail slot="start">
+    <img [src]="getImageUrl(imagenPrevia || imagen)" alt="Vista previa">
+  </ion-thumbnail>
+  <ion-button fill="clear" color="danger" (click)="eliminarImagen()">
+    <ion-icon name="trash" slot="icon-only"></ion-icon>
+  </ion-button>
+</ion-item>
+
+
+
+  <ion-item *ngIf="tipo == '1'">
+    <ion-label position="stacked" class="bold-label">Stock:</ion-label>
+    <ion-input type="number" [(ngModel)]="stock"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="stacked" class="bold-label">Precio:</ion-label>
+    <ion-input type="number" step="0.01" [(ngModel)]="precio"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="stacked" class="bold-label">Sucursal:</ion-label>
+    <ion-select [(ngModel)]="sucursal">
+      <ion-select-option *ngFor="let item of sucursales" [value]="item.BRAN_CODE">
+        {{ item.BRAN_NAME }}
+      </ion-select-option>
+    </ion-select>
+  </ion-item>
+
+
+  <!-- Botón para guardar o actualizar -->
+  <ion-button expand="full" (click)="guardar()">
+    {{ codigo ? 'Actualizar' : 'Guardar' }}
+  </ion-button>
+</ion-content>

@@ -1,0 +1,40 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button (click)="back()" defaultHref=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ codigo ? 'Editar Sucursal' : 'Nueva Sucursal' }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">{{ codigo ? 'Editar Sucursal' : 'Nueva Sucursal' }}</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <!-- Campos para ingresar los datos de la sucursal -->
+  <ion-item>
+    <ion-label position="stacked" class="bold-label">Nombre:</ion-label>
+    <ion-input type="text" [(ngModel)]="nombre"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="stacked" class="bold-label">Ubicación:</ion-label>
+    <ion-input type="text" [(ngModel)]="ubicacion"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="stacked" class="bold-label">Estado:</ion-label>
+    <ion-select [(ngModel)]="estado">
+      <ion-select-option value="1">Activo</ion-select-option>
+      <ion-select-option value="0">Inactivo</ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <!-- Botón para guardar o actualizar -->
+  <ion-button expand="full" (click)="guardar()">
+    {{ codigo ? 'Actualizar' : 'Guardar' }}
+  </ion-button>
+</ion-content>

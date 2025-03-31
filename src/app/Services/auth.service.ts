@@ -3,14 +3,18 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 //toast
 import { ToastController } from '@ionic/angular';
 import { Preferences } from '@capacitor/preferences';
+import { Observable } from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   serve: string = 'http://localhost/app-reslc/Ws-app-reslc/ws_app_back.php';
+  apiUrl: string = 'http://localhost/app-reslc/Ws-app-reslc/';  // O la URL base de tu servidor
 
   constructor(public http: HttpClient, public toastCtrl: ToastController) {}
+  
+  
   postData(body: any) {
     let head = new HttpHeaders({
       'Content-Type': 'application/json, charset:utf8',
@@ -20,6 +24,9 @@ export class AuthService {
     };
     return this.http.post(this.serve, JSON.stringify(body), options);
   }
+
+
+  
   async showToast(mensaje: string) {
     const toast = await this.toastCtrl.create({
       message: mensaje,
@@ -66,7 +73,15 @@ export class AuthService {
     return value;
   }
   
+  uploadImage(file: File): Observable<any> {
+  const formData = new FormData();
+  formData.append('imagen', file, file.name); // Adjuntar el archivo
 
+  return this.http.post(`${this.serve}?accion=subirImagen`, formData, {
+    headers: new HttpHeaders(),
+    responseType: 'json',
+  });
+}
 
 
   }

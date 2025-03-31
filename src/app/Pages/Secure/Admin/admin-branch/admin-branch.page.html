@@ -1,13 +1,38 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>admin-branch</ion-title>
+    <ion-title>Administración de Sucursales</ion-title>
+    <ion-buttons slot="start">
+      <ion-button (click)="cancelar()"> Menú </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">admin-branch</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <ion-item>
+    <ion-input [(ngModel)]="nombreSucursal" placeholder="Buscar Sucursal"></ion-input>
+    <ion-button expand="full" (click)="buscarSucursales()">Buscar</ion-button>
+  </ion-item>
+
+  <ion-list>
+    <ion-item *ngFor="let sucursal of Sucursales">
+      <ion-label>
+        <h2>{{ sucursal.nombre }}</h2>
+        <p>{{ sucursal.estatus }}</p>
+      </ion-label>
+      <ion-buttons slot="end">
+        <ion-button (click)="irEditar(sucursal.codigo)">
+          <ion-icon name="create"></ion-icon>
+        </ion-button>
+        <ion-button (click)="eliminar(sucursal.codigo)">
+          <ion-icon name="trash"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </ion-item>
+  </ion-list>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="nuevo()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>

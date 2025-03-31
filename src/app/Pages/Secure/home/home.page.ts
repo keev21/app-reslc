@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-
+import { NavController } from '@ionic/angular';
 @Component({
   selector: 'app-home',
   standalone: false,
@@ -10,7 +10,7 @@ export class HomePage implements OnInit {
   menuVisible: boolean = false;
   darkModeToggle: boolean = false;
 
-  constructor() { }
+  constructor( public navCtrl: NavController) { }
 
   ngOnInit() {
     this.loadDarkModePreference();
@@ -51,7 +51,15 @@ export class HomePage implements OnInit {
   logout() {
     console.log('Cerrar sesión del usuario');
   }
-
+  floors(){
+    this.navCtrl.navigateForward('admin-floors');
+  }
+  branch(){
+    this.navCtrl.navigateForward('admin-branch');
+  }
+  inventory(){
+    this.navCtrl.navigateForward('admin-inventory');
+  }
   toggleDarkMode(event: any) {
     this.darkModeToggle = event.detail.checked;
     document.body.classList.toggle('dark', this.darkModeToggle);

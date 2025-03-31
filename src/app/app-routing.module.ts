@@ -89,6 +89,23 @@ const routes: Routes = [
     path: 'admin-booking',
     loadChildren: () => import('./Pages/Secure/Admin/admin-booking/admin-booking.module').then( m => m.AdminBookingPageModule)
   },
+  {
+    path: 'edit-admin-floors',
+    loadChildren: () => import('./Pages/Secure/Admin/edit-admin-floors/edit-admin-floors.module').then( m => m.EditAdminFloorsPageModule)
+  },
+  {
+    path: 'edit-admin-branch',
+    loadChildren: () => import('./Pages/Secure/Admin/edit-admin-branch/edit-admin-branch.module').then( m => m.EditAdminBranchPageModule)
+  },  {
+    path: 'admin-inventory',
+    loadChildren: () => import('./Pages/Secure/Admin/admin-inventory/admin-inventory.module').then( m => m.AdminInventoryPageModule)
+  },
+  {
+    path: 'edit-admin-inventory',
+    loadChildren: () => import('./Pages/Secure/Admin/edit-admin-inventory/edit-admin-inventory.module').then( m => m.EditAdminInventoryPageModule)
+  },
+
+
  
 ];
 
