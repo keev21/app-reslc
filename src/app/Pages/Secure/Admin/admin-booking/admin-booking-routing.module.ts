@@ -7,7 +7,11 @@ const routes: Routes = [
   {
     path: '',
     component: AdminBookingPage
+  },  {
+    path: 'modal-booking',
+    loadChildren: () => import('./modal-booking/modal-booking.module').then( m => m.ModalBookingPageModule)
   }
+
 ];
 
 @NgModule({
