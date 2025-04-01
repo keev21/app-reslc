@@ -1,0 +1,52 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Administrar Mesas</ion-title>
+    <ion-buttons slot="start">
+      <ion-button (click)="back()">Atrás</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-fab horizontal="end" vertical="bottom" slot="fixed">
+  <ion-fab-button (click)="openTableModal()">
+    <ion-icon name="add"></ion-icon>
+  </ion-fab-button>
+</ion-fab>
+
+<ion-content [fullscreen]="true">
+  <!-- Seleccionar sucursal -->
+  <ion-item>
+    <ion-label position="stacked">Seleccione una sucursal:</ion-label>
+    <ion-select (ionChange)="onBranchSelect($event)" [value]="selectedBranchId">
+      <ion-select-option *ngFor="let branch of branches" [value]="branch.id">
+        {{ branch.nombre }} - {{ branch.direccion }}
+      </ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <!-- Seleccionar piso -->
+  <ion-item *ngIf="selectedBranchId">
+    <ion-label position="stacked">Seleccione un piso:</ion-label>
+    <ion-select (ionChange)="onFloorSelect($event)" [value]="selectedFloorId">
+      <ion-select-option *ngFor="let floor of floors" [value]="floor.id">
+        {{ floor.nombre }} - {{ floor.tipo }}
+      </ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <!-- Lista de mesas -->
+  <ion-list *ngIf="selectedFloorId">
+    <ion-list-header>
+      <ion-label>Mesas</ion-label>
+    </ion-list-header>
+    <ion-item *ngFor="let table of tables">
+      <ion-label>
+        <h2>{{ table.nombre }}</h2>
+        <p>Tipo: {{ table.tipo }}</p>
+        <p>Estado: {{ table.estado === '0' ? 'Activo' : 'Inactivo' }}</p>
+      </ion-label>
+      <ion-button fill="clear" color="warning" (click)="openTableModal(table)">Editar</ion-button>
+      <ion-button fill="clear" color="danger" (click)="deleteTable(table.id)">Eliminar</ion-button>
+    </ion-item>
+  </ion-list>
+</ion-content>

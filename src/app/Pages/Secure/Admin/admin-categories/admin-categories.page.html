@@ -1,13 +1,44 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>admin-categories</ion-title>
+    <ion-title>Administrar Categorías</ion-title>
+    <ion-buttons slot="start">
+      <ion-button (click)="back()">
+        Atrás
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
+<ion-fab horizontal="end" vertical="bottom" slot="fixed">
+  <ion-fab-button (click)="openCategoryModal()">
+    <ion-icon name="add"></ion-icon>
+  </ion-fab-button>
+</ion-fab>
+
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">admin-categories</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <!-- Seleccionar sucursal -->
+  <ion-item>
+    <ion-label position="stacked">Seleccione una sucursal:</ion-label>
+    <ion-select (ionChange)="onBranchSelect($event)" [value]="selectedBranchId">
+      <ion-select-option *ngFor="let branch of branches" [value]="branch.id">
+        {{ branch.nombre }} - {{ branch.direccion }}
+      </ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <!-- Lista de categorías -->
+  <ion-list>
+    <ion-list-header>
+      <ion-label>Categorías</ion-label>
+    </ion-list-header>
+    <ion-item *ngFor="let category of categories">
+      <ion-label>
+        <h2>{{ category.nombre }}</h2>
+        <p>Tipo: {{ category.tipo }}</p>
+        <p>Estado: {{ category.estado === '0' ? 'Activo' : 'Inactivo' }}</p>
+      </ion-label>
+      <ion-button fill="clear" color="warning" (click)="openCategoryModal(category)">Editar</ion-button>
+      <ion-button fill="clear" color="danger" (click)="deleteCategory(category.id)">Eliminar</ion-button>
+    </ion-item>
+  </ion-list>
 </ion-content>

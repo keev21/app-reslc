@@ -1,0 +1,68 @@
+<ion-header>
+    <ion-toolbar>
+      <ion-title>{{ segmento === 'empleados' ? 'Empleado' : 'Cliente' }}</ion-title>
+      <ion-buttons slot="end">
+        <ion-button (click)="dismissModal()">Cerrar</ion-button>
+      </ion-buttons>
+    </ion-toolbar>
+  </ion-header>
+  
+  <ion-content class="ion-padding">
+    <form (ngSubmit)="submitForm()">
+      <!-- Campos comunes -->
+      <ion-item>
+        <ion-label position="floating">Nombre</ion-label>
+        <ion-input [(ngModel)]="infoData.INFO_NAME" name="nombre" required></ion-input>
+      </ion-item>
+  
+      <ion-item>
+        <ion-label position="floating">Apellido</ion-label>
+        <ion-input [(ngModel)]="infoData.INFO_LASTNAME" name="apellido" required></ion-input>
+      </ion-item>
+  
+      <ion-item>
+        <ion-label position="floating">Teléfono</ion-label>
+        <ion-input [(ngModel)]="infoData.INFO_PHONE" name="telefono" type="tel" required></ion-input>
+      </ion-item>
+  
+      <ion-item>
+        <ion-label position="floating">Dirección</ion-label>
+        <ion-input [(ngModel)]="infoData.INFO_ADDRES" name="direccion" required></ion-input>
+      </ion-item>
+  
+      <!-- Campos específicos para empleados -->
+      <div *ngIf="segmento === 'empleados'">
+        <ion-item>
+          <ion-label position="floating">Email</ion-label>
+          <ion-input [(ngModel)]="userData.USER_EMAIL" name="email" type="email" required></ion-input>
+        </ion-item>
+  
+        <ion-item>
+          <ion-label position="floating">Contraseña</ion-label>
+          <ion-input [(ngModel)]="userData.USER_PASSWORD" name="password" type="password" [required]="!id_empleado"></ion-input>
+        </ion-item>
+  
+        <ion-item>
+          <ion-label>Rol</ion-label>
+          <ion-select [(ngModel)]="infoData.ROL_CODE" name="rol" interface="action-sheet" required>
+            <ion-select-option *ngFor="let rol of roles" [value]="rol.ROL_CODE">{{rol.ROL_TYPE}}</ion-select-option>
+          </ion-select>
+        </ion-item>
+  
+        <ion-item>
+          <ion-label>Sucursal</ion-label>
+          <ion-select [(ngModel)]="userData.BRAN_CODE" name="branch" interface="action-sheet" required>
+            <ion-select-option *ngFor="let branch of branches" [value]="branch.BRAN_CODE">{{branch.BRAN_NAME}}</ion-select-option>
+          </ion-select>
+        </ion-item>
+      </div>
+  
+      <ion-button type="submit" expand="block" class="ion-margin-top">
+        {{ id_empleado || id_cliente ? 'Actualizar' : 'Guardar' }}
+      </ion-button>
+  
+      <ion-button *ngIf="id_empleado || id_cliente" color="danger" expand="block" (click)="deleteUser()">
+        Eliminar
+      </ion-button>
+    </form>
+  </ion-content>

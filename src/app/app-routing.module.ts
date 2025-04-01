@@ -96,7 +96,8 @@ const routes: Routes = [
   {
     path: 'edit-admin-branch',
     loadChildren: () => import('./Pages/Secure/Admin/edit-admin-branch/edit-admin-branch.module').then( m => m.EditAdminBranchPageModule)
-  },  {
+  },
+  {
     path: 'admin-inventory',
     loadChildren: () => import('./Pages/Secure/Admin/admin-inventory/admin-inventory.module').then( m => m.AdminInventoryPageModule)
   },
@@ -104,8 +105,34 @@ const routes: Routes = [
     path: 'edit-admin-inventory',
     loadChildren: () => import('./Pages/Secure/Admin/edit-admin-inventory/edit-admin-inventory.module').then( m => m.EditAdminInventoryPageModule)
   },
-
-
+  {
+    path: 'admin-invoices',
+    loadChildren: () => import('./Pages/Secure/Admin/admin-invoices/admin-invoices.module').then( m => m.AdminInvoicesPageModule)
+  },
+  {
+    path: 'admin-users',
+    loadChildren: () => import('./Pages/Secure/Admin/admin-users/admin-users.module').then( m => m.AdminUsersPageModule)
+  },
+  {
+    path: 'admin-recipes',
+    loadChildren: () => import('./Pages/Secure/Admin/admin-recipes/admin-recipes.module').then( m => m.AdminRecipesPageModule)
+  },
+  {
+    path: 'admin-products',
+    loadChildren: () => import('./Pages/Secure/Admin/admin-products/admin-products.module').then( m => m.AdminProductsPageModule)
+  },
+  {
+    path: 'admin-booking',
+    loadChildren: () => import('./Pages/Secure/Admin/admin-booking/admin-booking.module').then( m => m.AdminBookingPageModule)
+  },
+  {
+    path: 'admin-tables',
+    loadChildren: () => import('./Pages/Secure/Admin/admin-tables/admin-tables.module').then( m => m.AdminTablesPageModule)
+  },
+  {
+    path: 'admin-roles',
+    loadChildren: () => import('./Pages/Secure/Admin/admin-roles/admin-roles.module').then( m => m.AdminRolesPageModule)
+  },
  
 ];
 

@@ -1,0 +1,31 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Administrar Roles</ion-title>
+    <ion-buttons slot="start">
+      <ion-button (click)="back()">Atrás</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-fab horizontal="end" vertical="bottom" slot="fixed">
+  <ion-fab-button (click)="openRoleModal()">
+    <ion-icon name="add"></ion-icon>
+  </ion-fab-button>
+</ion-fab>
+
+<ion-content [fullscreen]="true">
+  <!-- Lista de roles -->
+  <ion-list>
+    <ion-list-header>
+      <ion-label>Roles</ion-label>
+    </ion-list-header>
+    <ion-item *ngFor="let role of roles">
+      <ion-label>
+        <h2>{{ role.tipo }}</h2>
+        <p>Estado: {{ role.estado === '0' ? 'Activo' : 'Inactivo' }}</p>
+      </ion-label>
+      <ion-button fill="clear" color="warning" (click)="openRoleModal(role)">Editar</ion-button>
+      <ion-button fill="clear" color="danger" (click)="deleteRole(role.id)">Eliminar</ion-button>
+    </ion-item>
+  </ion-list>
+</ion-content>

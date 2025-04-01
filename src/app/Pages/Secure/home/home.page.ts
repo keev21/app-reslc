@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { NavController } from '@ionic/angular';
+import {AuthService} from '../../../Services/auth.service';
+
+
 @Component({
   selector: 'app-home',
   standalone: false,
@@ -9,11 +12,28 @@ import { NavController } from '@ionic/angular';
 export class HomePage implements OnInit {
   menuVisible: boolean = false;
   darkModeToggle: boolean = false;
+  rol: string = '';
+  branch: string = '';
+  user: string = '';
+  constructor(
+    public servicio: AuthService, public navCtrl: NavController
 
-  constructor( public navCtrl: NavController) { }
-
+  ) 
+  { 
+    this.servicio.getSession('ROL_CODE').then((res: any) => {
+      this.rol = res;
+      console.log('Rol:', this.rol);
+    });
+    this.servicio.getSession('BRAN_CODE').then((res: any) => {
+      this.branch = res;
+      console.log('Branch:', this.branch);
+    });
+    this.servicio.getSession('USER_CODE').then((res: any) => {
+      this.user = res;
+      console.log('User:', this.user);
+    });
+  }
   ngOnInit() {
-    this.loadDarkModePreference();
   }
 
   toggleMenu() {
@@ -54,7 +74,7 @@ export class HomePage implements OnInit {
   floors(){
     this.navCtrl.navigateForward('admin-floors');
   }
-  branch(){
+  branches(){
     this.navCtrl.navigateForward('admin-branch');
   }
   inventory(){
@@ -66,11 +86,5 @@ export class HomePage implements OnInit {
     localStorage.setItem('darkMode', JSON.stringify(this.darkModeToggle));
   }
 
-  loadDarkModePreference() {
-    const savedDarkMode = localStorage.getItem('darkMode');
-    if (savedDarkMode) {
-      this.darkModeToggle = JSON.parse(savedDarkMode);
-      document.body.classList.toggle('dark', this.darkModeToggle);
-    }
-  }
+ 
 }

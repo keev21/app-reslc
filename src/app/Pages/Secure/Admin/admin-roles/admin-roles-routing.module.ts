@@ -1,15 +1,15 @@
 import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
-import { AdminUsersPage } from './admin-users.page';
+import { AdminRolesPage } from './admin-roles.page';
 
 const routes: Routes = [
   {
     path: '',
-    component: AdminUsersPage
+    component: AdminRolesPage
   },  {
-    path: 'user-modal',
-    loadChildren: () => import('./user-modal/user-modal.module').then( m => m.UserModalPageModule)
+    path: 'role-modal',
+    loadChildren: () => import('./role-modal/role-modal.module').then( m => m.RoleModalPageModule)
   }
 
 ];
@@ -18,4 +18,4 @@ const routes: Routes = [
   imports: [RouterModule.forChild(routes)],
   exports: [RouterModule],
 })
-export class AdminUsersPageRoutingModule {}
+export class AdminRolesPageRoutingModule {}
