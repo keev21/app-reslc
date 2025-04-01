@@ -1,7 +1,7 @@
 <?php
 
 
-if ($post['accion'] == "cargarSucursales") {
+if ($post['accion'] == "cargarSucursales1") {
     // Realizamos el INNER JOIN para obtener BUSH_CODE y BUIF_NAME
     $sentencia = sprintf("SELECT * FROM res_branch_office");
 

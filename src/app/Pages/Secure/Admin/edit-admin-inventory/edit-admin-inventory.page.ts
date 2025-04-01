@@ -34,7 +34,7 @@ export class EditAdminInventoryPage implements OnInit {
   }
 
   ngOnInit() {
-    this.cargarSucursales();
+    this.cargarSucursales1();
   }
 
   back() {
@@ -79,9 +79,9 @@ export class EditAdminInventoryPage implements OnInit {
   }
 
  
-  cargarSucursales() {
+  cargarSucursales1() {
     let datos = {
-      "accion": "cargarSucursales",
+      "accion": "cargarSucursales1",
     }
     this.servicio.postData(datos).subscribe((res: any) => {
       if (res.estado == true) {
