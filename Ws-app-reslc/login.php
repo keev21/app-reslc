@@ -27,6 +27,5 @@ if (isset($post['accion']) && $post['accion'] == "login") {
             $respuesta = array("estado" => false, "mensaje" => "Contraseña incorrecta");
         }
     }
-
     echo $respuesta;
 }
