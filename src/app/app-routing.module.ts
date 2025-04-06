@@ -132,7 +132,11 @@ const routes: Routes = [
   {
     path: 'admin-roles',
     loadChildren: () => import('./Pages/Secure/Admin/admin-roles/admin-roles.module').then( m => m.AdminRolesPageModule)
+  },  {
+    path: 'edit-admin-products',
+    loadChildren: () => import('./Pages/Secure/Admin/edit-admin-products/edit-admin-products.module').then( m => m.EditAdminProductsPageModule)
   },
+
  
 ];
 

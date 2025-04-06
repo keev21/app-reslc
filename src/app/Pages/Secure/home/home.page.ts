@@ -80,6 +80,9 @@ export class HomePage implements OnInit {
   inventory(){
     this.navCtrl.navigateForward('admin-inventory');
   }
+  products(){
+    this.navCtrl.navigateForward('admin-products');
+  }
   toggleDarkMode(event: any) {
     this.darkModeToggle = event.detail.checked;
     document.body.classList.toggle('dark', this.darkModeToggle);
