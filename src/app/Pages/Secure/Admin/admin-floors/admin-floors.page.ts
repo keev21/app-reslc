@@ -22,7 +22,7 @@ export class AdminFloorsPage implements OnInit {
   ) {}
 
   async ngOnInit() {
-    this.selectedBranchId = await this.servicio.getSession('BRAN_CODE') || "";
+    this.selectedBranchId = await this.servicio.getSession('BRAN_CODE') || '';
     if (this.selectedBranchId) {
       this.loadBranchName();
       this.obtenerPisos();

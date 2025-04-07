@@ -11,6 +11,7 @@ import { AuthService } from '../../../../Services/auth.service';
 export class EditAdminFloorsPage implements OnInit {
   nombre: string = '';
   tipo: string = '';
+  branchinfo: any[] = []; // Añadimos esta propiedad
   rama: string = '';
   estado: string = '1';
   codigo: string = '';
@@ -34,7 +35,7 @@ export class EditAdminFloorsPage implements OnInit {
   }
 
   ngOnInit() {
-    
+   
   }
 
   back() {
@@ -60,6 +61,12 @@ export class EditAdminFloorsPage implements OnInit {
   
 
   guardar() {
+    // Validaciones básicas
+    if (!this.nombre || !this.tipo) {
+      this.servicio.showToast('Nombre y tipo son campos requeridos');
+      return;
+    }
+
     let datos = {
       accion: this.codigo ? 'Actualizarpiso' : 'Agregarpiso',
       codigo: this.codigo || '',
@@ -73,7 +80,12 @@ export class EditAdminFloorsPage implements OnInit {
       if (res.estado === true) {
         this.servicio.showToast(this.codigo ? 'Piso actualizado correctamente' : 'Piso guardado correctamente');
         this.navCtrl.back();
+      } else {
+        this.servicio.showToast(res.mensaje);
       }
+    }, (error) => {
+      console.error('Error en la solicitud:', error);
+      this.servicio.showToast('Error al guardar el piso');
     });
   }
 }
