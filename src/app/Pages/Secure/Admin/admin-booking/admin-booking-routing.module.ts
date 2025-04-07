@@ -10,6 +10,10 @@ const routes: Routes = [
   },  {
     path: 'modal-booking',
     loadChildren: () => import('./modal-booking/modal-booking.module').then( m => m.ModalBookingPageModule)
+  },
+  {
+    path: 'modal-booking-user',
+    loadChildren: () => import('./modal-booking-user/modal-booking-user.module').then( m => m.ModalBookingUserPageModule)
   }
 
 ];
