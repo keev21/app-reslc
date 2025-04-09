@@ -133,9 +133,9 @@ if ($post['accion'] == "crearReserva" || $post['accion'] == "editarReserva") {
     }
 
     // Verificar que la mesa existe
-    $checkMesa = mysqli_query($mysqli, "SELECT TAB_CODE FROM res_table WHERE TAB_CODE = '$mesa' AND TAB_STATUS = '0'");
+    $checkMesa = mysqli_query($mysqli, "SELECT TAB_CODE FROM res_table WHERE TAB_CODE = '$mesa'");
     if (mysqli_num_rows($checkMesa) == 0) {
-        echo json_encode(['estado' => false, 'mensaje' => 'La mesa seleccionada no existe o no está disponible']);
+        echo json_encode(['estado' => false, 'mensaje' => 'La mesa seleccionada no existe']);
         exit;
     }
 
@@ -152,23 +152,51 @@ if ($post['accion'] == "crearReserva" || $post['accion'] == "editarReserva") {
         exit;
     }
 
-    if ($post['accion'] == "crearReserva") {
-        $sql = "INSERT INTO res_booking (INFO_CODE, BOO_DATEBOOKING, TAB_CODE, BOO_STATE)
-                VALUES ('$clienteId', '$fechaFormateada', '$mesa', '$estado')";
-    } else {
-        $id = mysqli_real_escape_string($mysqli, $post['id']);
-        $sql = "UPDATE res_booking SET 
-                INFO_CODE = '$clienteId',
-                BOO_DATEBOOKING = '$fechaFormateada',
-                TAB_CODE = '$mesa',
-                BOO_STATE = '$estado'
-                WHERE BOO_CODE = '$id'";
-    }
-    
-    if (mysqli_query($mysqli, $sql)) {
+    // Iniciar transacción para asegurar la integridad de los datos
+    mysqli_begin_transaction($mysqli);
+
+    try {
+        if ($post['accion'] == "crearReserva") {
+            $sql = "INSERT INTO res_booking (INFO_CODE, BOO_DATEBOOKING, TAB_CODE, BOO_STATE)
+                    VALUES ('$clienteId', '$fechaFormateada', '$mesa', '$estado')";
+        } else {
+            $id = mysqli_real_escape_string($mysqli, $post['id']);
+            
+            // Primero, obtener la mesa anterior para volverla a disponible
+            $sql_old_mesa = "SELECT TAB_CODE FROM res_booking WHERE BOO_CODE = '$id'";
+            $result_old_mesa = mysqli_query($mysqli, $sql_old_mesa);
+            if (mysqli_num_rows($result_old_mesa) > 0) {
+                $old_mesa = mysqli_fetch_assoc($result_old_mesa)['TAB_CODE'];
+                mysqli_query($mysqli, "UPDATE res_table SET TAB_STATUS = '0' WHERE TAB_CODE = '$old_mesa'");
+            }
+            
+            $sql = "UPDATE res_booking SET 
+                    INFO_CODE = '$clienteId',
+                    BOO_DATEBOOKING = '$fechaFormateada',
+                    TAB_CODE = '$mesa',
+                    BOO_STATE = '$estado'
+                    WHERE BOO_CODE = '$id'";
+        }
+        
+        // Ejecutar la consulta de reserva
+        if (!mysqli_query($mysqli, $sql)) {
+            throw new Exception('Error al guardar reserva: ' . mysqli_error($mysqli));
+        }
+        
+        // Actualizar el estado de la mesa a inactivo (1)
+        $updateMesa = "UPDATE res_table SET TAB_STATUS = '1' WHERE TAB_CODE = '$mesa'";
+        if (!mysqli_query($mysqli, $updateMesa)) {
+            throw new Exception('Error al actualizar estado de mesa: ' . mysqli_error($mysqli));
+        }
+        
+        // Confirmar la transacción
+        mysqli_commit($mysqli);
         echo json_encode(['estado' => true, 'mensaje' => 'Reserva guardada correctamente']);
-    } else {
-        echo json_encode(['estado' => false, 'mensaje' => 'Error al guardar reserva: ' . mysqli_error($mysqli)]);
+        
+    } catch (Exception $e) {
+        // Revertir la transacción en caso de error
+        mysqli_rollback($mysqli);
+        echo json_encode(['estado' => false, 'mensaje' => $e->getMessage()]);
     }
     exit;
 }
@@ -177,19 +205,40 @@ if ($post['accion'] == "crearReserva" || $post['accion'] == "editarReserva") {
 if ($post['accion'] == "eliminarReserva") {
     $id = mysqli_real_escape_string($mysqli, $post['id']);
     
-    // Verificar que la reserva existe
-    $checkReserva = mysqli_query($mysqli, "SELECT BOO_CODE FROM res_booking WHERE BOO_CODE = '$id'");
-    if (mysqli_num_rows($checkReserva) == 0) {
-        echo json_encode(['estado' => false, 'mensaje' => 'La reserva no existe']);
-        exit;
-    }
+    // Iniciar transacción
+    mysqli_begin_transaction($mysqli);
 
-    $sql = "DELETE FROM res_booking WHERE BOO_CODE = '$id'";
-    
-    if (mysqli_query($mysqli, $sql)) {
+    try {
+        // Primero, obtener la mesa asociada a la reserva
+        $sql_mesa = "SELECT TAB_CODE FROM res_booking WHERE BOO_CODE = '$id'";
+        $result_mesa = mysqli_query($mysqli, $sql_mesa);
+        
+        if (mysqli_num_rows($result_mesa) == 0) {
+            throw new Exception('La reserva no existe');
+        }
+        
+        $mesa = mysqli_fetch_assoc($result_mesa)['TAB_CODE'];
+        
+        // Eliminar la reserva
+        $sql = "DELETE FROM res_booking WHERE BOO_CODE = '$id'";
+        if (!mysqli_query($mysqli, $sql)) {
+            throw new Exception('Error al eliminar reserva');
+        }
+        
+        // Actualizar el estado de la mesa a disponible (0)
+        $updateMesa = "UPDATE res_table SET TAB_STATUS = '0' WHERE TAB_CODE = '$mesa'";
+        if (!mysqli_query($mysqli, $updateMesa)) {
+            throw new Exception('Error al actualizar estado de mesa');
+        }
+        
+        // Confirmar la transacción
+        mysqli_commit($mysqli);
         echo json_encode(['estado' => true, 'mensaje' => 'Reserva eliminada correctamente']);
-    } else {
-        echo json_encode(['estado' => false, 'mensaje' => 'Error al eliminar reserva']);
+        
+    } catch (Exception $e) {
+        // Revertir la transacción en caso de error
+        mysqli_rollback($mysqli);
+        echo json_encode(['estado' => false, 'mensaje' => $e->getMessage()]);
     }
     exit;
 }

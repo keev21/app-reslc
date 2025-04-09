@@ -34,6 +34,7 @@ export class AdminTablesPage implements OnInit {
     } else {
       this.authService.showToast('No se encontró sucursal asignada');
       this.navCtrl.back(); // Regresar si no hay sucursal asignada
+      
     }
   }
 

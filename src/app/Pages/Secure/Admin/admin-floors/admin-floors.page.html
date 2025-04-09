@@ -21,7 +21,7 @@
       <ion-label>
         <h2>{{piso.nombre}}</h2>
         <p>{{ piso.tipo }}</p>
-        <p>Estado: {{ piso.estatus === '1' ? 'Activo' : 'Inactivo' }}</p>
+        <p>Estado: {{ piso.estatus === '0' ? 'Activo' : 'Inactivo' }}</p>
       </ion-label>
       <ion-buttons slot="end">
         <ion-button (click)="irEditar(piso.codigo)">
