@@ -136,6 +136,10 @@ const routes: Routes = [
     path: 'edit-admin-products',
     loadChildren: () => import('./Pages/Secure/Admin/edit-admin-products/edit-admin-products.module').then( m => m.EditAdminProductsPageModule)
   },
+  {
+    path: 'edit-admin-recipes',
+    loadChildren: () => import('./Pages/Secure/Admin/edit-admin-recipes/edit-admin-recipes.module').then( m => m.EditAdminRecipesPageModule)
+  },
 
  
 ];

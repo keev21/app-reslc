@@ -25,4 +25,5 @@ if (isset($_GET['accion']) && $_GET['accion'] == "subirImagen") {
     require_once './users.php';
     require_once './booking.php';
     require_once './products.php';
+    require_once './recipes.php';
 }
