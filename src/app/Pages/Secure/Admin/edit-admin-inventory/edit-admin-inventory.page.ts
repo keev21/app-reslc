@@ -10,6 +10,7 @@ import { AuthService } from '../../../../Services/auth.service';
 })
 export class EditAdminInventoryPage implements OnInit {
   nombre: string = '';
+  categoria: string = '';
   tipo: string = '1';
   iva: string = '0';
   imagen: string = '';
@@ -17,6 +18,7 @@ export class EditAdminInventoryPage implements OnInit {
   precio: string = '0';
   sucursal: string = '';
   sucursales: any[] = [];
+  categorias: any[] = [];
   codigo: string = '';
   imagenPrevia: string | null = null;
   archivoImagen: File | null = null;
@@ -35,6 +37,7 @@ export class EditAdminInventoryPage implements OnInit {
 
   ngOnInit() {
     this.cargarSucursales1();
+    this.cargarCategorias();
   }
 
   back() {
@@ -56,6 +59,18 @@ export class EditAdminInventoryPage implements OnInit {
     return `${this.servicio.apiUrl}${ruta}`;
   }
 
+  cargarCategorias() {
+    let datos = {
+      accion: 'cargarCategorys'
+    };
+    this.servicio.postData(datos).subscribe((res: any) => {
+      if (res.estado === true) {
+        this.categorias = res.datos;
+      } else {
+        this.servicio.showToast(res.mensaje);
+      }
+    });
+  }
   cargarProducto() {
     let datos = {
       accion: 'loadProducto',
@@ -72,6 +87,7 @@ export class EditAdminInventoryPage implements OnInit {
         this.stock = producto.INV_STOCK;
         this.precio = producto.INV_PRICE;
         this.sucursal = producto.BRAN_CODE;
+        this.categoria = producto.CAT_CODE;
       } else {
         this.servicio.showToast(res.mensaje);
       }

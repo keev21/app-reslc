@@ -22,7 +22,24 @@ if ($post['accion'] == "cargarSucursales1") {
     echo $respuesta;
 }
 
+// Añadir esta función al archivo products.php que ya teníamos
+if ($post['accion'] == "cargarCategorys") {
+    $sentencia = "SELECT * FROM res_category"; // Asumiendo que tienes una tabla de categorías
+    $result = mysqli_query($mysqli, $sentencia);
 
+    if (mysqli_num_rows($result) > 0) {
+        while ($row = mysqli_fetch_array($result)) {
+            $datos[] = array(
+                'CAT_CODE' => $row['CAT_CODE'],
+                'CAT_NAME' => $row['CAT_NAME']
+            );
+        }
+        $respuesta = json_encode(array('estado' => true, "datos" => $datos));
+    } else {
+        $respuesta = json_encode(array('estado' => false, "mensaje" => "No se encontraron categorías."));
+    }
+    echo $respuesta;
+}
 
 
 

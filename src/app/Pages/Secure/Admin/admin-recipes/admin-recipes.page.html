@@ -17,7 +17,7 @@
     <ion-item *ngFor="let receta of recetas">
       <ion-label>
         <h2>Producto ID: {{ receta.PRO_NAME }}</h2>
-        <p>Estado: {{ receta.REC_STATUS }}</p>
+        <p>Estado: {{ receta.REC_STATUS === '1' ? 'Activo' : 'Inactivo' }}</p>
       </ion-label>
       <ion-buttons slot="end">
         <ion-button (click)="irEditar(receta.REC_CODE)">

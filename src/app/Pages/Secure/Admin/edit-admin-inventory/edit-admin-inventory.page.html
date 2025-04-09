@@ -19,6 +19,15 @@
     <ion-label position="stacked" class="bold-label">Nombre:</ion-label>
     <ion-input type="text" [(ngModel)]="nombre"></ion-input>
   </ion-item>
+  
+  <ion-item>
+    <ion-label position="stacked" class="bold-label">Categoría:</ion-label>
+    <ion-select [(ngModel)]="categoria">
+      <ion-select-option *ngFor="let cat of categorias" [value]="cat.CAT_CODE">
+        {{ cat.CAT_NAME }}
+      </ion-select-option>
+    </ion-select>
+  </ion-item>
 
   <ion-item>
     <ion-label position="stacked" class="bold-label">Tipo:</ion-label>
