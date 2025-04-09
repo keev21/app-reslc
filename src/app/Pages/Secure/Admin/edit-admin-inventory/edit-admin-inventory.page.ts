@@ -22,7 +22,10 @@ export class EditAdminInventoryPage implements OnInit {
   codigo: string = '';
   imagenPrevia: string | null = null;
   archivoImagen: File | null = null;
-
+  unidad: string = '';
+  margen: string = '0';
+  precioFinal: number = 0;
+  
   constructor(
     public navCtrl: NavController,
     public servicio: AuthService
@@ -44,7 +47,16 @@ export class EditAdminInventoryPage implements OnInit {
     this.navCtrl.back();
   }
 
-
+  calcularPrecioVenta() {
+    const precioBase = parseFloat(this.precio) || 0;
+    const ivaPorcentaje = parseFloat(this.iva) || 0;
+    const margenPorcentaje = parseFloat(this.margen) || 0;
+  
+    const precioConIva = precioBase + (precioBase * ivaPorcentaje / 100);
+    const precioConMargen = precioConIva + (precioBase * margenPorcentaje / 100);
+    this.precioFinal = parseFloat(precioConMargen.toFixed(2));
+  }
+  
 
   // Añade esta función para manejar las URLs de imagen
   getImageUrl(ruta: string): string {
@@ -88,6 +100,10 @@ export class EditAdminInventoryPage implements OnInit {
         this.precio = producto.INV_PRICE;
         this.sucursal = producto.BRAN_CODE;
         this.categoria = producto.CAT_CODE;
+        this.unidad = producto.INV_UNIT_NAME;
+        this.margen = producto.INV_MARGIN;
+        this.precioFinal = producto.INV_PRICE_IVA_MARGIN;
+
       } else {
         this.servicio.showToast(res.mensaje);
       }
@@ -146,9 +162,14 @@ export class EditAdminInventoryPage implements OnInit {
       return;
     }
   
-    if (this.tipo == '1' && !this.stock) {
-      this.servicio.showToast('El stock es requerido para productos');
-      return;
+    if (this.tipo == '1') {
+      const stockNum = parseInt(this.stock);
+      if (isNaN(stockNum) || stockNum < 0) {
+        this.servicio.showToast('El stock no puede ser negativo');
+        return;
+      }
+    } else {
+      this.stock = '0'; // Servicio → stock en cero
     }
   
     if (!this.precio) {
@@ -156,49 +177,33 @@ export class EditAdminInventoryPage implements OnInit {
       return;
     }
   
-    // Subir imagen si es que se ha seleccionado una nueva
-    if (this.archivoImagen) {
-      this.servicio.uploadImage(this.archivoImagen).subscribe(
-        (res: any) => {
-          if (res.estado) {
-            // Guardamos la ruta de la imagen en la base de datos
-            this.imagen = res.rutaImagen; // Asume que la respuesta incluye la ruta de la imagen subida
-            this.guardarProducto();
-          } else {
-            this.servicio.showToast('Error al subir la imagen');
-          }
-        },
-        (error) => {
-          this.servicio.showToast('Error de conexión');
-        }
-      );
-    } else {
-      this.guardarProducto(); // Si no hay imagen, se guarda el producto sin ella
-    }
-  }
+    this.calcularPrecioVenta(); // Asegurarnos de tener el valor final actualizado
   
-  guardarProducto() {
-    let datos = {
-      accion: this.codigo ? 'ActualizarProducto' : 'AgregarProducto',
-      codigo: this.codigo || '',
+    const datos = {
+      accion: this.codigo ? 'actualizarProducto' : 'guardarProducto',
+      codigo: this.codigo,
       nombre: this.nombre,
       tipo: this.tipo,
       iva: this.iva,
-      imagen: this.imagen,
+      margen: this.margen,
+      unidad: this.unidad,
       stock: this.stock,
       precio: this.precio,
-      sucursal: this.sucursal
+      precio_final: this.precioFinal,
+      imagen: this.imagen, // o la ruta que tengas
+      sucursal: this.sucursal,
+      categoria: this.categoria
     };
   
+    // Aquí puedes hacer el POST a tu API
     this.servicio.postData(datos).subscribe((res: any) => {
-      if (res.estado === true) {
-        this.servicio.showToast(res.mensaje);
+      this.servicio.showToast(res.mensaje);
+      if (res.estado) {
         this.navCtrl.back();
-      } else {
-        this.servicio.showToast(res.mensaje);
       }
     });
   }
+  
   
  
 
