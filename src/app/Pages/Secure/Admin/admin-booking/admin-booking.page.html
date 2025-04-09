@@ -37,17 +37,21 @@
         <p>Estado: {{booking.estado === '0' ? 'Activo' : 'Inactivo'}}</p>
       </ion-label>
       <ion-buttons slot="end">
-        <ion-button fill="clear" color="warning" (click)="openBookingModal(booking)">
+        <ion-button *ngIf="rol !== 'Mesero'" fill="clear" color="warning" (click)="openBookingModal(booking)">
           <ion-icon name="create"></ion-icon>
         </ion-button>
-        <ion-button fill="clear" color="danger" (click)="deleteBooking(booking.id)">
+        <ion-button *ngIf="rol !== 'Mesero'" fill="clear" color="danger" (click)="deleteBooking(booking.id)">
           <ion-icon name="trash"></ion-icon>
+        </ion-button>
+        <ion-button *ngIf="rol === 'Mesero'" fill="clear" color="primary" (click)="addOrder(booking)">
+          <ion-icon name="cart"></ion-icon>
+          <ion-label>Agregar pedido</ion-label>
         </ion-button>
       </ion-buttons>
     </ion-item>
   </ion-list>
 
-  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+  <ion-fab *ngIf="rol !== 'Mesero'" vertical="bottom" horizontal="end" slot="fixed">
     <ion-fab-button (click)="openBookingModal()">
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>

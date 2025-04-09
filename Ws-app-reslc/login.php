@@ -4,22 +4,23 @@ if ($post['accion'] == "login") {
     $email = $post['email'];
     $password = $post['password'];
 
-    // Verificar si el usuario existe con INNER JOIN a res_info
+    // Verificar si el usuario existe con INNER JOIN a res_info y res_rol
     $sentencia = sprintf("
     SELECT 
-    u.USER_CODE, 
-  
-    u.USER_EMAIL, 
-    u.USER_PASSWORD, 
-
-    u.BRAN_CODE,
-    i.ROL_CODE
-FROM 
-    res_user u
-INNER JOIN 
-    res_info i ON u.INFO_CODE = i.INFO_CODE
-WHERE 
-    u.USER_EMAIL= '%s'", 
+        u.USER_CODE, 
+        u.USER_EMAIL, 
+        u.USER_PASSWORD, 
+        u.BRAN_CODE,
+        i.ROL_CODE,
+        r.ROL_TYPE
+    FROM 
+        res_user u
+    INNER JOIN 
+        res_info i ON u.INFO_CODE = i.INFO_CODE
+    INNER JOIN
+        res_rol r ON i.ROL_CODE = r.ROL_CODE
+    WHERE 
+        u.USER_EMAIL = '%s'", 
         mysqli_real_escape_string($mysqli, $email));
     
     $result = mysqli_query($mysqli, $sentencia);
@@ -37,7 +38,8 @@ WHERE
                     'id' => $usuario['USER_CODE'],
                     'email' => $usuario['USER_EMAIL'],
                     'branch' => $usuario['BRAN_CODE'],
-                    'rol' => $usuario['ROL_CODE']
+                    'rol' => $usuario['ROL_CODE'],
+                    'rol_type' => $usuario['ROL_TYPE']  // Añadido el tipo de rol
                 )
             ));
         } else {

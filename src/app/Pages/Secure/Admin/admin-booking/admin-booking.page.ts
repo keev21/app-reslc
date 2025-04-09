@@ -16,13 +16,20 @@ export class AdminBookingPage implements OnInit {
   fechaReserva: string = '';
   selectedBranchId: string = '';
   branchName: string = '';
+  rol: string = '';
 
   constructor(
     private authService: AuthService,
     private modalCtrl: ModalController,
     private alertController: AlertController,
     private navCtrl: NavController
-  ) {}
+  ) {
+    this. authService.getSession('ROL_TYPE').then((res: any) => {
+      this.rol = res;
+      console.log('Rol:', this.rol);
+    });
+
+  }
 
   async ngOnInit() {
     this.selectedBranchId = await this.authService.getSession('BRAN_CODE') || '';
@@ -96,6 +103,15 @@ export class AdminBookingPage implements OnInit {
     });
 
     await modal.present();
+  }
+  addOrder(booking: any) {
+    // Aquí puedes implementar la lógica para agregar un pedido
+    // Por ejemplo, navegar a una página de pedidos o abrir un modal
+    console.log('Agregar pedido para la reserva:', booking);
+    // Ejemplo:
+   this.authService.createSession('BOOKING_CODE', booking.id);
+   console.log('Booking Code:', booking.id);
+   // this.navCtrl.navigateForward('/add-order'); // Ajusta esta ruta según tu aplicación
   }
 
   async deleteBooking(bookingId: string) {
