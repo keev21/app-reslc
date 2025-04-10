@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { NavController } from '@ionic/angular';
 import { AuthService } from '../../../../Services/auth.service';
+import { AlertController } from '@ionic/angular';
 
 @Component({
   selector: 'app-admin-floors',
@@ -11,35 +12,60 @@ import { AuthService } from '../../../../Services/auth.service';
 export class AdminFloorsPage implements OnInit {
   Pisos: any[] = [];
   nombrePiso: string = '';
-  constructor(public servicio: AuthService, public navCtrl: NavController) {}
+  selectedBranchId: string = '';
+  branchName: string = '';
 
-  ngOnInit() {
-    this.obtenerPisos();
-  }
-//BUSCAR EMPRESA
-buscarPisos() {
-  let datos = {
-    accion: 'consultarPisos',
-    nombrePiso: this.nombrePiso,
-  };
-  this.servicio.postData(datos).subscribe((res: any) => {
-    if (res.estado === true) {
-      this.Pisos = res.datos;
+  constructor(
+    public servicio: AuthService, 
+    public navCtrl: NavController,
+    private alertController: AlertController
+  ) {}
+
+  async ngOnInit() {
+    this.selectedBranchId = await this.servicio.getSession('BRAN_CODE') || '';
+    if (this.selectedBranchId) {
+      this.loadBranchName();
+      this.obtenerPisos();
     } else {
-      this.servicio.showToast(res.mensaje);
-    }
-  });
-}
+      this.servicio.showToast('No se encontró sucursal asignada');
+      }
+  }
+
+  loadBranchName() {
+    let datos = {
+      accion: 'getBranchName',
+      id: this.selectedBranchId
+    };
+    this.servicio.postData(datos).subscribe((res: any) => {
+      if (res.estado === true) {
+        this.branchName = res.nombre;
+      }
+    });
+  }
+
+  buscarPisos() {
+    let datos = {
+      accion: 'consultarPisosPorSucursal',
+      nombrePiso: this.nombrePiso,
+      sucursal: this.selectedBranchId
+    };
+    this.servicio.postData(datos).subscribe((res: any) => {
+      if (res.estado === true) {
+        this.Pisos = res.datos;
+      } else {
+        this.servicio.showToast(res.mensaje);
+      }
+    });
+  }
 
   obtenerPisos() {
     let datos = {
-      accion: 'consultarPisos',
+      accion: 'consultarPisosPorSucursal',
+      sucursal: this.selectedBranchId
     };
     this.servicio.postData(datos).subscribe(
       (res: any) => {
-        console.log(res); // Agrega este log para ver la respuesta
         if (res.estado === true) {
-          console.log(res.datos); // Agrega este log para ver la respuesta
           this.Pisos = res.datos;
         } else {
           this.servicio.showToast(res.mensaje);
@@ -52,47 +78,63 @@ buscarPisos() {
   }
 
   nuevo() {
-    // this.authService.closeSession('codigo');
-    // this.navCtrl.navigateRoot(['edit-business-information']);
     this.servicio.createSession('codigo','');
     this.navCtrl.navigateRoot(['edit-admin-floors']);
   }
 
-  //IR A EDITAR EN EL CAMPO DE EDITAR EMPRESA
   irEditar(codigo: string) {
     this.servicio.createSession('codigo', codigo);
     this.navCtrl.navigateRoot(['edit-admin-floors']);
   }
 
-  //FUNCION PARA ELIMINAR EMPRESA
-  eliminar(codigo?: string) {
-    if (codigo) {
-      let datos = {
-        accion: 'eliminarPiso',
-        codigo: codigo,
-      };
-      console.log(datos);
-      this.servicio.postData(datos).subscribe(
-        (res: any) => {
-          if (res.estado === true) {
-            this.servicio.showToast('Piso eliminado correctamente');
-            this.obtenerPisos();
-          } else {
-            this.servicio.showToast(res.mensaje);
-          }
-        },
-        (error) => {
-          console.error('Error en la solicitud:', error);
-        }
-      );
-    } else {
-      this.servicio.showToast('Código del Empresa no encontrado');
+  async eliminar(codigo?: string) {
+    if (!codigo) {
+      this.servicio.showToast('Código del piso no encontrado');
+      return;
     }
+
+    const alert = await this.alertController.create({
+      header: 'Confirmar eliminación',
+      message: '¿Estás seguro de que deseas eliminar este piso?',
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Eliminar',
+          handler: () => {
+            this.confirmDelete(codigo);
+          }
+        }
+      ]
+    });
+
+    await alert.present();
   }
 
-  //REGRESO AL MENU
+  confirmDelete(codigo: string) {
+    let datos = {
+      accion: 'eliminarPiso',
+      codigo: codigo
+    };
+    
+    this.servicio.postData(datos).subscribe(
+      (res: any) => {
+        if (res.estado === true) {
+          this.servicio.showToast('Piso eliminado correctamente');
+          this.obtenerPisos();
+        } else {
+          this.servicio.showToast(res.mensaje);
+        }
+      },
+      (error) => {
+        console.error('Error en la solicitud:', error);
+      }
+    );
+  }
+
   cancelar() {
     this.navCtrl.back();
   }
-
 }

@@ -44,6 +44,9 @@ export class LoginPage implements OnInit {
         this.servicio.createSession('USER_CODE', res.usuario.id);
         this.servicio.createSession('BRAN_CODE', res.usuario.branch);
         this.servicio.createSession('ROL_CODE', res.usuario.rol); // Nuevo: Guardar el rol
+        //guardar el rol type
+        this.servicio.createSession('ROL_TYPE', res.usuario.rol_type);
+        
        
         this.navCtrl.navigateRoot(['/home']);
       } else {

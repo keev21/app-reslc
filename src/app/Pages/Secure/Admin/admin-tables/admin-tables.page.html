@@ -14,14 +14,12 @@
 </ion-fab>
 
 <ion-content [fullscreen]="true">
-  <!-- Seleccionar sucursal -->
-  <ion-item>
-    <ion-label position="stacked">Seleccione una sucursal:</ion-label>
-    <ion-select (ionChange)="onBranchSelect($event)" [value]="selectedBranchId">
-      <ion-select-option *ngFor="let branch of branches" [value]="branch.id">
-        {{ branch.nombre }} - {{ branch.direccion }}
-      </ion-select-option>
-    </ion-select>
+  <!-- Mostrar sucursal actual -->
+  <ion-item *ngIf="branchName">
+    <ion-label>
+      <h2>Sucursal actual:</h2>
+      <p>{{ branchName }}</p>
+    </ion-label>
   </ion-item>
 
   <!-- Seleccionar piso -->

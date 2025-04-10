@@ -154,3 +154,54 @@ if ($post['accion'] == "eliminarPiso") {
     }
     echo $respuesta;
 }
+// Nueva función para consultar pisos por sucursal
+if ($post['accion'] == "consultarPisosPorSucursal") {
+    $nombrePisos = isset($post['nombrePiso']) ? $post['nombrePiso'] : '';
+    $sucursal = $post['sucursal'];
+    
+    $where = "rf.BRAN_CODE = '".mysqli_real_escape_string($mysqli, $sucursal)."'";
+    
+    if ($nombrePisos != '') {
+        $where .= " AND rf.FLOO_NAME LIKE '%".mysqli_real_escape_string($mysqli, $nombrePisos)."%'";
+    }
+    
+    $sentencia = "SELECT rf.FLOO_CODE as codigo, rf.FLOO_NAME as nombre, rf.FLOO_TYPE as tipo, 
+                 rbo.BRAN_NAME as codigobranch, rf.FLOO_STATUS as estatus 
+                 FROM res_floor rf 
+                 INNER JOIN res_branch_office rbo ON rf.BRAN_CODE = rbo.BRAN_CODE 
+                 WHERE $where";
+    
+    $result = mysqli_query($mysqli, $sentencia);
+    if (mysqli_num_rows($result) > 0) {
+        while ($row = mysqli_fetch_array($result)) {
+            $datos[] = array(
+                'codigo' => $row['codigo'],
+                'nombre' => $row['nombre'],
+                'tipo' => $row['tipo'],
+                'codigobranch' => $row['codigobranch'],
+                'estatus' => $row['estatus'],
+            );
+        }
+        $respuesta = json_encode(array('estado' => true, "datos" => $datos));
+    } else {
+        $respuesta = json_encode(array('estado' => false, "mensaje" => "No se encontraron pisos para esta sucursal."));
+    }
+    echo $respuesta;
+}
+
+// Función para obtener nombre de sucursal
+if ($post['accion'] == "getBranchName2") {
+    $id = $post['id'];
+    $sentencia = sprintf(
+        "SELECT BRAN_NAME as nombre FROM res_branch_office WHERE BRAN_CODE = '%s'",
+        mysqli_real_escape_string($mysqli, $id)
+    );
+    $result = mysqli_query($mysqli, $sentencia);
+    if (mysqli_num_rows($result) > 0) {
+        $row = mysqli_fetch_assoc($result);
+        $respuesta = json_encode(array('estado' => true, "nombre" => $row['nombre']));
+    } else {
+        $respuesta = json_encode(array('estado' => false, "mensaje" => "Sucursal no encontrada"));
+    }
+    echo $respuesta;
+}

@@ -1,6 +1,6 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>Administrar Reservas</ion-title>
+    <ion-title>Reservas - {{branchName}}</ion-title>
     <ion-buttons slot="start">
       <ion-button (click)="back()">Atrás</ion-button>
     </ion-buttons>
@@ -8,89 +8,55 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <!-- Buscador en la parte superior -->
-  <ion-searchbar 
-    [(ngModel)]="busqueda" 
-    (ionChange)="buscarReservas()" 
-    placeholder="Buscar por nombre o apellido"
-    animated
-    debounce="500"
-    class="sticky-searchbar">
-  </ion-searchbar>
-
-  <!-- Filtros debajo del buscador -->
-  <ion-card>
-    <ion-card-content>
-      <!-- Botón para seleccionar fecha -->
-      <ion-item lines="none">
-        <ion-label>Fecha reserva:</ion-label>
-        <ion-button fill="outline" (click)="openDatePicker()">
-          {{ fecha | date:'dd/MM/yyyy' }}
-          <ion-icon name="calendar-outline" slot="end"></ion-icon>
-        </ion-button>
-      </ion-item>
-
-      <!-- Selector de piso -->
-      <ion-item lines="none">
-        <ion-label position="stacked">Piso:</ion-label>
-        <ion-select 
-          [(ngModel)]="pisoSeleccionado" 
-          (ionChange)="cambiarPiso($event)"
-          interface="action-sheet">
-          <ion-select-option *ngFor="let piso of pisos" [value]="piso.FLOO_CODE">
-            {{ piso.FLOO_NAME }} ({{ piso.FLOO_TYPE }})
-          </ion-select-option>
-        </ion-select>
-      </ion-item>
-    </ion-card-content>
-  </ion-card>
-
-  <!-- Lista de reservas -->
-  <ion-list *ngIf="reservas.length > 0">
-    <ion-list-header>
-      <ion-label>Reservas encontradas: {{reservas.length}}</ion-label>
-    </ion-list-header>
-    
-    <ion-item-sliding *ngFor="let reserva of reservas">
-      <ion-item>
-        <ion-label>
-          <h2>{{ reserva.INFO_NAME }} {{ reserva.INFO_LASTNAME }}</h2>
-          <p>
-            <ion-icon name="time-outline"></ion-icon>
-            {{ reserva.BOO_DATEBOOKING | date:'dd/MM/yyyy HH:mm' }}
-          </p>
-          <p>
-            <ion-icon name="business-outline"></ion-icon>
-            Mesa {{ reserva.TAB_NAME }} (Piso {{ reserva.FLOO_NAME }})
-          </p>
-         
-        </ion-label>
-      </ion-item>
-
-      <ion-item-options side="end">
-        <ion-item-option color="warning" (click)="abrirModalReserva(reserva)">
-          <ion-icon slot="icon-only" name="create-outline"></ion-icon>
-        </ion-item-option>
-        <ion-item-option color="danger" (click)="eliminarReserva(reserva)">
-          <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
-        </ion-item-option>
-      </ion-item-options>
-    </ion-item-sliding>
-  </ion-list>
-
-  <!-- Mensaje cuando no hay reservas -->
-  <ion-item *ngIf="reservas.length === 0" lines="none">
-    <ion-label class="ion-text-center" color="medium">
-      <ion-icon name="calendar-clear-outline" size="large"></ion-icon>
-      <h2>No hay reservas para esta fecha</h2>
-      <p>Seleccione otra fecha o intente con otro criterio de búsqueda</p>
-    </ion-label>
+  <!-- Filtros de búsqueda -->
+  <ion-item>
+    <ion-input
+      [(ngModel)]="nombreCliente"
+      placeholder="Buscar por nombre"
+      (ionChange)="buscarPorNombre()"
+    ></ion-input>
   </ion-item>
 
-  <!-- Botón flotante para agregar -->
-  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button (click)="abrirModalReserva()">
+  <ion-item>
+    <ion-label>Buscar por fecha:</ion-label>
+    <ion-input
+      type="date"
+      [(ngModel)]="fechaReserva"
+      (ionChange)="buscarPorFecha()"
+    ></ion-input>
+    <ion-button fill="clear" (click)="limpiarFiltros()">Limpiar</ion-button>
+  </ion-item>
+
+  <!-- Lista de reservas -->
+  <ion-list>
+    <ion-item *ngFor="let booking of bookings">
+      <ion-label>
+        <h2>{{booking.nombre_cliente}}</h2>
+        <p>Mesa: {{booking.mesa_nombre}}</p>
+        <p>Fecha: {{booking.fecha_reserva | date:'medium'}}</p>
+        <p>Estado: {{booking.estado === '0' ? 'Activo' : 'Inactivo'}}</p>
+      </ion-label>
+      <ion-buttons slot="end">
+        <ion-button *ngIf="rol !== 'Mesero'" fill="clear" color="warning" (click)="openBookingModal(booking)">
+          <ion-icon name="create"></ion-icon>
+        </ion-button>
+        <ion-button *ngIf="rol !== 'Mesero'" fill="clear" color="danger" (click)="deleteBooking(booking.id)">
+          <ion-icon name="trash"></ion-icon>
+        </ion-button>
+        <ion-button *ngIf="rol === 'Mesero'" fill="clear" color="primary" (click)="addOrder(booking)">
+          <ion-icon name="cart"></ion-icon>
+          <ion-label>Agregar pedido</ion-label>
+        </ion-button>
+      </ion-buttons>
+    </ion-item>
+  </ion-list>
+
+  <ion-fab *ngIf="rol !== 'Mesero'" vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="openBookingModal()">
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
   </ion-fab>
+
+
 </ion-content>
+

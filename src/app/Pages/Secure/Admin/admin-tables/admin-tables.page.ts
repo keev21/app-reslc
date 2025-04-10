@@ -12,11 +12,11 @@ import { TableModalPage } from './table-modal/table-modal.page';
   styleUrls: ['./admin-tables.page.scss'],
 })
 export class AdminTablesPage implements OnInit {
-  branches: any[] = []; // Lista de sucursales
   floors: any[] = []; // Lista de pisos
   tables: any[] = []; // Lista de mesas
-  selectedBranchId: string = ''; // ID de la sucursal seleccionada
+  selectedBranchId: string = ''; // ID de la sucursal (obtenido de la sesión)
   selectedFloorId: string = ''; // ID del piso seleccionado
+  branchName: string = ''; // Nombre de la sucursal
 
   constructor(
     public navCtrl: NavController,
@@ -25,38 +25,36 @@ export class AdminTablesPage implements OnInit {
     private modalCtrl: ModalController
   ) {}
 
-  ngOnInit() {
-    this.loadBranches(); // Cargar sucursales al iniciar
+  async ngOnInit() {
+    // Obtener el branch ID de la sesión
+    this.selectedBranchId = await this.authService.getSession('BRAN_CODE') || "";
+    if (this.selectedBranchId) {
+      this.loadBranchName(); // Cargar nombre de la sucursal
+      this.loadFloors(); // Cargar pisos directamente
+    } else {
+      this.authService.showToast('No se encontró sucursal asignada');
+      this.navCtrl.back(); // Regresar si no hay sucursal asignada
+      
+    }
   }
 
-  // Cargar sucursales
-  loadBranches() {
+  // Cargar nombre de la sucursal
+  loadBranchName() {
     let datos = {
-      accion: 'cargarSucursales'
+      accion: 'getBranchName',
+      id: this.selectedBranchId
     };
     this.authService.postData(datos).subscribe((res: any) => {
       if (res.estado === true) {
-        this.branches = res.sucursales;
+        this.branchName = res.nombre;
       } else {
         this.authService.showToast(res.mensaje);
       }
     });
   }
 
-  // Seleccionar sucursal
-  onBranchSelect(event: any) {
-    this.selectedBranchId = event.detail.value;
-    this.authService.createSession('BRAN_CODE', this.selectedBranchId); // Guardar el ID de la sucursal
-    this.loadFloors(); // Cargar pisos de la sucursal seleccionada
-  }
-
   // Cargar pisos por sucursal
   loadFloors() {
-    if (!this.selectedBranchId) {
-      this.authService.showToast('Seleccione una sucursal.');
-      return;
-    }
-
     let datos = {
       accion: 'cargarPisosPorSucursal',
       sucursal: this.selectedBranchId
@@ -73,8 +71,8 @@ export class AdminTablesPage implements OnInit {
   // Seleccionar piso
   onFloorSelect(event: any) {
     this.selectedFloorId = event.detail.value;
-    this.authService.createSession('FLOO_CODE', this.selectedFloorId); // Guardar el ID del piso
-    this.loadTables(); // Cargar mesas del piso seleccionado
+    this.authService.createSession('FLOO_CODE', this.selectedFloorId);
+    this.loadTables();
   }
 
   // Cargar mesas por piso
@@ -99,14 +97,22 @@ export class AdminTablesPage implements OnInit {
 
   // Abrir modal para agregar/editar mesa
   async openTableModal(table: any = null) {
+    if (!this.selectedFloorId) {
+      this.authService.showToast('Seleccione un piso primero');
+      return;
+    }
+
     if (table) {
-      this.authService.createSession('TAB_CODE', table.id); // Guardar el ID de la mesa si se está editando
+      this.authService.createSession('TAB_CODE', table.id);
     } else {
-      this.authService.createSession('TAB_CODE', ''); // Limpiar el ID si es una nueva mesa
+      this.authService.createSession('TAB_CODE', '');
     }
 
     const modal = await this.modalCtrl.create({
       component: TableModalPage,
+      componentProps: {
+        floorId: this.selectedFloorId // Pasar el piso seleccionado al modal
+      }
     });
 
     modal.onDidDismiss().then(() => {
@@ -132,13 +138,13 @@ export class AdminTablesPage implements OnInit {
         {
           text: 'Eliminar',
           handler: () => {
-            this.confirmDelete(tableId); // Llamar a la función de eliminación
+            this.confirmDelete(tableId);
           }
         }
       ]
     });
 
-    await alert.present(); // Mostrar la alerta
+    await alert.present();
   }
 
   // Confirmar eliminación de la mesa
@@ -151,7 +157,7 @@ export class AdminTablesPage implements OnInit {
     this.authService.postData(datos).subscribe((res: any) => {
       if (res.estado === true) {
         this.authService.showToast('Mesa eliminada correctamente.');
-        this.loadTables(); // Recargar la lista de mesas
+        this.loadTables();
       } else {
         this.authService.showToast(res.mensaje);
       }

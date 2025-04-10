@@ -157,3 +157,24 @@ if ($post['accion'] == "cargarPisosPorSucursal") {
 
     echo $respuesta;
 }
+// Obtener nombre de sucursal
+if ($post['accion'] == "getBranchName") {
+    $id = $post['id'];
+
+    $sentencia = sprintf(
+        "SELECT BRAN_NAME as nombre 
+        FROM res_branch_office 
+        WHERE BRAN_CODE = '%s'",
+        mysqli_real_escape_string($mysqli, $id))
+    ;
+    $result = mysqli_query($mysqli, $sentencia);
+
+    if (mysqli_num_rows($result) > 0) {
+        $row = mysqli_fetch_assoc($result);
+        $respuesta = json_encode(array('estado' => true, "nombre" => $row['nombre']));
+    } else {
+        $respuesta = json_encode(array('estado' => false, "mensaje" => "Sucursal no encontrada"));
+    }
+
+    echo $respuesta;
+}
