@@ -242,3 +242,52 @@ if ($post['accion'] == "eliminarReserva") {
     }
     exit;
 }
+
+// Verificar si existe una orden para una reserva
+if ($post['accion'] == "verificarOrdenReserva") {
+    $boo_code = mysqli_real_escape_string($mysqli, $post['boo_code']);
+    
+    $sql = "SELECT ORD_CODE, BOO_CODE FROM res_order WHERE BOO_CODE = '$boo_code' LIMIT 1";
+    $result = mysqli_query($mysqli, $sql);
+    
+    if (mysqli_num_rows($result) > 0) {
+        $orden = mysqli_fetch_assoc($result);
+        echo json_encode(['estado' => true, 'ord_code' => $orden['ORD_CODE']]);
+    } else {
+        echo json_encode(['estado' => false]);
+    }
+    exit;
+}
+
+// Crear una nueva orden para una reserva
+if ($post['accion'] == "crearOrdenReserva") {
+    $boo_code = mysqli_real_escape_string($mysqli, $post['boo_code']);
+    $ord_date = date('Y-m-d H:i:s');
+    $ord_status = '0'; // 0 = Activa, 1 = Finalizada, etc. (ajusta según tu sistema)
+    $ord_total = '0.00';
+    
+    // Generar un código único para la orden (ajusta según tu sistema)
+    $ord_code = uniqid('ORD_');
+    
+    // Iniciar transacción
+    mysqli_begin_transaction($mysqli);
+    
+    try {
+        $sql = "INSERT INTO res_order (ORD_CODE, BOO_CODE, ORD_DATE, ORD_STATUS, ORD_TOTAL)
+                VALUES ('$ord_code', '$boo_code', '$ord_date', '$ord_status', '$ord_total')";
+        
+        if (!mysqli_query($mysqli, $sql)) {
+            throw new Exception('Error al crear la orden: ' . mysqli_error($mysqli));
+        }
+        
+        // Confirmar la transacción
+        mysqli_commit($mysqli);
+        echo json_encode(['estado' => true, 'ord_code' => $ord_code, 'mensaje' => 'Orden creada correctamente']);
+        
+    } catch (Exception $e) {
+        // Revertir la transacción en caso de error
+        mysqli_rollback($mysqli);
+        echo json_encode(['estado' => false, 'mensaje' => $e->getMessage()]);
+    }
+    exit;
+}

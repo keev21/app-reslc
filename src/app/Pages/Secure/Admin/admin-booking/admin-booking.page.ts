@@ -104,15 +104,67 @@ export class AdminBookingPage implements OnInit {
 
     await modal.present();
   }
-  addOrder(booking: any) {
-    // Aquí puedes implementar la lógica para agregar un pedido
-    // Por ejemplo, navegar a una página de pedidos o abrir un modal
-    console.log('Agregar pedido para la reserva:', booking);
-    // Ejemplo:
-   this.authService.createSession('BOOKING_CODE', booking.id);
-   console.log('Booking Code:', booking.id);
-   // this.navCtrl.navigateForward('/add-order'); // Ajusta esta ruta según tu aplicación
+  async addOrder(booking: any) {
+    const alert = await this.alertController.create({
+      header: 'Confirmar',
+      message: '¿Desea agregar un pedido para esta reserva?',
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Aceptar',
+          handler: () => {
+            this.processOrder(booking.id);
+          }
+        }
+      ]
+    });
+  
+    await alert.present();
   }
+  async processOrder(bookingId: string) {
+    const datos = {
+      accion: 'verificarOrdenReserva',
+      boo_code: bookingId
+    };
+  
+    this.authService.postData(datos).subscribe(async (res: any) => {
+      if (res.estado === true) {
+        // Ya existe una orden, solo guardamos las variables de sesión
+        await this.authService.createSession('ORD_CODE', res.ord_code);
+        await this.authService.createSession('BOO_CODE', bookingId);
+        this.navCtrl.navigateForward('/admin-order');
+      } else {
+        // No existe orden, creamos una nueva
+        this.createNewOrder(bookingId);
+      }
+    }, error => {
+      this.authService.showToast('Error al verificar la orden');
+    });
+  }
+  async createNewOrder(bookingId: string) {
+    const datos = {
+      accion: 'crearOrdenReserva',
+      boo_code: bookingId
+    };
+  
+    this.authService.postData(datos).subscribe(async (res: any) => {
+      if (res.estado === true) {
+        await this.authService.createSession('ORD_CODE', res.ord_code);
+        await this.authService.createSession('BOO_CODE', bookingId);
+        this.navCtrl.navigateForward('/admin-order');
+      } else {
+        this.authService.showToast(res.mensaje || 'Error al crear la orden');
+      }
+    }, error => {
+      this.authService.showToast('Error al crear la orden');
+    });
+  }
+  
+
+  
 
   async deleteBooking(bookingId: string) {
     const alert = await this.alertController.create({
