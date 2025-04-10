@@ -25,7 +25,8 @@ export class EditAdminInventoryPage implements OnInit {
   unidad: string = '';
   margen: string = '0';
   precioFinal: number = 0;
-  
+  aplicaIva: boolean = false;
+
   constructor(
     public navCtrl: NavController,
     public servicio: AuthService
@@ -36,11 +37,25 @@ export class EditAdminInventoryPage implements OnInit {
         this.cargarProducto();
       }
     });
+
+    this.servicio.getSession('BRAN_CODE').then((res: any) => {
+      this.sucursal = res;
+      if (this.codigo) {
+        this.cargarProducto();
+      }
+    });
   }
 
   ngOnInit() {
     this.cargarSucursales1();
     this.cargarCategorias();
+  }
+
+  toggleIva() {
+    if (!this.aplicaIva) {
+      this.iva = '0';
+      this.calcularPrecioVenta();
+    }
   }
 
   back() {
@@ -56,18 +71,14 @@ export class EditAdminInventoryPage implements OnInit {
     const precioConMargen = precioConIva + (precioBase * margenPorcentaje / 100);
     this.precioFinal = parseFloat(precioConMargen.toFixed(2));
   }
-  
 
-  // Añade esta función para manejar las URLs de imagen
   getImageUrl(ruta: string): string {
     if (!ruta) return '';
     
-    // Si es una vista previa (base64) o URL completa
     if (ruta.startsWith('data:') || ruta.startsWith('http')) {
       return ruta;
     }
     
-    // Si es una ruta relativa del servidor
     return `${this.servicio.apiUrl}${ruta}`;
   }
 
@@ -83,6 +94,7 @@ export class EditAdminInventoryPage implements OnInit {
       }
     });
   }
+
   cargarProducto() {
     let datos = {
       accion: 'loadProducto',
@@ -98,34 +110,30 @@ export class EditAdminInventoryPage implements OnInit {
         this.imagen = producto.INV_IMAGE;
         this.stock = producto.INV_STOCK;
         this.precio = producto.INV_PRICE;
-        this.sucursal = producto.BRAN_CODE;
         this.categoria = producto.CAT_CODE;
         this.unidad = producto.INV_UNIT_NAME;
         this.margen = producto.INV_MARGIN;
         this.precioFinal = producto.INV_PRICE_IVA_MARGIN;
-
+        this.aplicaIva = parseFloat(this.iva) > 0;
+        this.calcularPrecioVenta();
       } else {
         this.servicio.showToast(res.mensaje);
       }
     });
   }
 
- 
   cargarSucursales1() {
     let datos = {
       "accion": "cargarSucursales1",
     }
     this.servicio.postData(datos).subscribe((res: any) => {
       if (res.estado == true) {
-        this.sucursales = res.datos;  // Guarda los datos de las sedes
-        console.log("los datos son",this.sucursales);
+        this.sucursales = res.datos;
       } else {
         this.servicio.showToast(res.mensaje);
       }
     });
   }
-
-
 
   onFileChange(event: any) {
     const file = event.target.files[0];
@@ -169,7 +177,7 @@ export class EditAdminInventoryPage implements OnInit {
         return;
       }
     } else {
-      this.stock = '0'; // Servicio → stock en cero
+      this.stock = '0';
     }
   
     if (!this.precio) {
@@ -177,9 +185,27 @@ export class EditAdminInventoryPage implements OnInit {
       return;
     }
   
-    this.calcularPrecioVenta(); // Asegurarnos de tener el valor final actualizado
+    if (this.archivoImagen) {
+      this.servicio.uploadImage(this.archivoImagen).subscribe(
+        (res: any) => {
+          if (res.estado) {
+            this.imagen = res.rutaImagen;
+            this.guardarProducto();
+          } else {
+            this.servicio.showToast('Error al subir la imagen');
+          }
+        },
+        (error) => {
+          this.servicio.showToast('Error de conexión');
+        }
+      );
+    } else {
+      this.guardarProducto();
+    }
+  }
   
-    const datos = {
+  guardarProducto() {
+    let datos = {
       accion: this.codigo ? 'actualizarProducto' : 'guardarProducto',
       codigo: this.codigo,
       nombre: this.nombre,
@@ -190,22 +216,18 @@ export class EditAdminInventoryPage implements OnInit {
       stock: this.stock,
       precio: this.precio,
       precio_final: this.precioFinal,
-      imagen: this.imagen, // o la ruta que tengas
+      imagen: this.imagen,
       sucursal: this.sucursal,
       categoria: this.categoria
     };
   
-    // Aquí puedes hacer el POST a tu API
     this.servicio.postData(datos).subscribe((res: any) => {
-      this.servicio.showToast(res.mensaje);
-      if (res.estado) {
+      if (res.estado === true) {
+        this.servicio.showToast(res.mensaje);
         this.navCtrl.back();
+      } else {
+        this.servicio.showToast(res.mensaje);
       }
     });
   }
-  
-  
- 
-
-
 }

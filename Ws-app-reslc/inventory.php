@@ -99,11 +99,12 @@ if ($post['accion'] == "guardarProducto" || $post['accion'] == "actualizarProduc
     $stock = $post['stock'];
     $precio = $post['precio'];
     $sucursal = $post['sucursal'];
-
+    $categoria = $post['categoria'];
+    
     if ($post['accion'] == "guardarProducto") {
         $sentencia = sprintf(
-            "INSERT INTO res_inventory (INV_NAME, INV_TYPE, INV_IVA, INV_MARGIN, INV_IMAGE, INV_UNIT_NAME, INV_STOCK, INV_PRICE, INV_PRICE_IVA_MARGIN, BRAN_CODE) 
-            VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s')",
+            "INSERT INTO res_inventory (INV_NAME, INV_TYPE, INV_IVA, INV_MARGIN, INV_IMAGE, INV_UNIT_NAME, INV_STOCK, INV_PRICE, INV_PRICE_IVA_MARGIN, BRAN_CODE, CAT_CODE) 
+            VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')",
             mysqli_real_escape_string($mysqli, $nombre),
             mysqli_real_escape_string($mysqli, $tipo),
             mysqli_real_escape_string($mysqli, $iva),
@@ -113,7 +114,8 @@ if ($post['accion'] == "guardarProducto" || $post['accion'] == "actualizarProduc
             mysqli_real_escape_string($mysqli, $stock),
             mysqli_real_escape_string($mysqli, $precio),
             mysqli_real_escape_string($mysqli, $precio_final),
-            mysqli_real_escape_string($mysqli, $sucursal)
+            mysqli_real_escape_string($mysqli, $sucursal),
+            mysqli_real_escape_string($mysqli, $categoria)
         );
     } else {
         $codigo = $post['codigo'];
@@ -128,7 +130,8 @@ if ($post['accion'] == "guardarProducto" || $post['accion'] == "actualizarProduc
             INV_STOCK='%s', 
             INV_PRICE='%s', 
             INV_PRICE_IVA_MARGIN='%s',
-            BRAN_CODE='%s' 
+            BRAN_CODE='%s',
+            CAT_CODE='%s' 
             WHERE INV_CODE='%s'",
             mysqli_real_escape_string($mysqli, $nombre),
             mysqli_real_escape_string($mysqli, $tipo),
@@ -140,6 +143,7 @@ if ($post['accion'] == "guardarProducto" || $post['accion'] == "actualizarProduc
             mysqli_real_escape_string($mysqli, $precio),
             mysqli_real_escape_string($mysqli, $precio_final),
             mysqli_real_escape_string($mysqli, $sucursal),
+            mysqli_real_escape_string($mysqli, $categoria),
             mysqli_real_escape_string($mysqli, $codigo)
         );
     }
