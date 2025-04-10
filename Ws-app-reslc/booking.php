@@ -247,7 +247,7 @@ if ($post['accion'] == "eliminarReserva") {
 if ($post['accion'] == "verificarOrdenReserva") {
     $boo_code = mysqli_real_escape_string($mysqli, $post['boo_code']);
     
-    $sql = "SELECT ORD_CODE, BOO_CODE FROM res_order WHERE BOO_CODE = '$boo_code' LIMIT 1";
+    $sql = "SELECT ORD_CODE FROM res_order WHERE BOO_CODE = '$boo_code' LIMIT 1";
     $result = mysqli_query($mysqli, $sql);
     
     if (mysqli_num_rows($result) > 0) {
@@ -259,30 +259,33 @@ if ($post['accion'] == "verificarOrdenReserva") {
     exit;
 }
 
-// Crear una nueva orden para una reserva
 if ($post['accion'] == "crearOrdenReserva") {
     $boo_code = mysqli_real_escape_string($mysqli, $post['boo_code']);
     $ord_date = date('Y-m-d H:i:s');
-    $ord_status = '0'; // 0 = Activa, 1 = Finalizada, etc. (ajusta según tu sistema)
+    $ord_status = '0'; // 0 = Activa, 1 = Finalizada, etc.
     $ord_total = '0.00';
-    
-    // Generar un código único para la orden (ajusta según tu sistema)
-    $ord_code = uniqid('ORD_');
     
     // Iniciar transacción
     mysqli_begin_transaction($mysqli);
     
     try {
-        $sql = "INSERT INTO res_order (ORD_CODE, BOO_CODE, ORD_DATE, ORD_STATUS, ORD_TOTAL)
-                VALUES ('$ord_code', '$boo_code', '$ord_date', '$ord_status', '$ord_total')";
+        $sql = "INSERT INTO res_order (BOO_CODE, ORD_DATE, ORD_STATUS, ORD_TOTAL)
+                VALUES ('$boo_code', '$ord_date', '$ord_status', '$ord_total')";
         
         if (!mysqli_query($mysqli, $sql)) {
             throw new Exception('Error al crear la orden: ' . mysqli_error($mysqli));
         }
         
+        // Obtenemos el ID de la orden recién insertada (ORD_CODE que es autoincremental)
+        $ord_code = mysqli_insert_id($mysqli);
+        
         // Confirmar la transacción
         mysqli_commit($mysqli);
-        echo json_encode(['estado' => true, 'ord_code' => $ord_code, 'mensaje' => 'Orden creada correctamente']);
+        echo json_encode([
+            'estado' => true, 
+            'ord_code' => $ord_code, // Este es el ID autoincremental
+            'mensaje' => 'Orden creada correctamente'
+        ]);
         
     } catch (Exception $e) {
         // Revertir la transacción en caso de error

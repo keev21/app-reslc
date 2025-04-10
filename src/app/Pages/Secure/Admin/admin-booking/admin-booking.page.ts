@@ -153,8 +153,10 @@ export class AdminBookingPage implements OnInit {
     this.authService.postData(datos).subscribe(async (res: any) => {
       if (res.estado === true) {
         await this.authService.createSession('ORD_CODE', res.ord_code);
+        console.log('ORD_CODE:', res.ord_code);
         await this.authService.createSession('BOO_CODE', bookingId);
-        this.navCtrl.navigateForward('/admin-order');
+        console.log('BOO_CODE:', bookingId);
+       this.navCtrl.navigateForward('/admin-order');
       } else {
         this.authService.showToast(res.mensaje || 'Error al crear la orden');
       }
