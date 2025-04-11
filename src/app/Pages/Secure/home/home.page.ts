@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { NavController } from '@ionic/angular';
+import { Component, OnInit, HostListener } from '@angular/core';
+import { NavController, AlertController  } from '@ionic/angular';
 import {AuthService} from '../../../Services/auth.service';
 
 
@@ -16,7 +16,7 @@ export class HomePage implements OnInit {
   branch: string = '';
   user: string = '';
   constructor(
-    public servicio: AuthService, public navCtrl: NavController
+    public servicio: AuthService, public navCtrl: NavController, private alertCtrl: AlertController,
 
   ) 
   { 
@@ -83,11 +83,69 @@ export class HomePage implements OnInit {
   products(){
     this.navCtrl.navigateForward('admin-products');
   }
+
+  recipes(){
+    this.navCtrl.navigateForward('admin-recipes');
+  }
   toggleDarkMode(event: any) {
     this.darkModeToggle = event.detail.checked;
     document.body.classList.toggle('dark', this.darkModeToggle);
     localStorage.setItem('darkMode', JSON.stringify(this.darkModeToggle));
   }
 
+
+
+  @HostListener('window:beforeunload', ['$event'])
+  async handleBeforeUnload(event: any) {
+    const alert = await this.alertCtrl.create({
+      header: 'Cerrar sesión',
+      message: '¿Estás seguro de que deseas cerrar sesión?',
+      buttons: [
+        {
+          text: 'No',
+          role: 'cancel',
+          handler: () => {
+            event.preventDefault(); // Cancelar la acción de cerrar
+          }
+        },
+        {
+          text: 'Sí',
+          handler: () => {
+            this.cerrarSession(); // Llama al método de cerrar sesión
+          }
+        }
+      ]
+    });
+    await alert.present();
+    event.returnValue = ''; // Este valor es necesario para que el navegador muestre el cuadro de diálogo
+  }
+  async confirmarCerrarSesion() {
+    const alert = await this.alertCtrl.create({
+      header: 'Cerrar sesión',
+      message: '¿Estás seguro de que deseas cerrar sesión?',
+      buttons: [
+        {
+          text: 'No',
+          role: 'cancel',
+          handler: () => {
+            // El usuario eligió no cerrar sesión
+            history.pushState(null, '');
+          }
+        },
+        {
+          text: 'Sí',
+          handler: () => {
+            this.cerrarSession(); // Llama al método de cerrar sesión
+          }
+        }
+      ]
+    });
+    await alert.present();
+  }
+  
+  cerrarSession() {
+    this.servicio.closeSession('USAD_CODE');
+    this.navCtrl.navigateRoot('login', { replaceUrl: true });
+  }
  
 }

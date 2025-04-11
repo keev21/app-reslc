@@ -22,7 +22,24 @@ if ($post['accion'] == "cargarSucursales1") {
     echo $respuesta;
 }
 
+// Añadir esta función al archivo products.php que ya teníamos
+if ($post['accion'] == "cargarCategorys") {
+    $sentencia = "SELECT * FROM res_category"; // Asumiendo que tienes una tabla de categorías
+    $result = mysqli_query($mysqli, $sentencia);
 
+    if (mysqli_num_rows($result) > 0) {
+        while ($row = mysqli_fetch_array($result)) {
+            $datos[] = array(
+                'CAT_CODE' => $row['CAT_CODE'],
+                'CAT_NAME' => $row['CAT_NAME']
+            );
+        }
+        $respuesta = json_encode(array('estado' => true, "datos" => $datos));
+    } else {
+        $respuesta = json_encode(array('estado' => false, "mensaje" => "No se encontraron categorías."));
+    }
+    echo $respuesta;
+}
 
 
 
@@ -46,7 +63,7 @@ if ($post['accion'] == "consultarProductos") {
                 'iva' => $row['INV_IVA'],
                 'imagen' => $row['INV_IMAGE'],
                 'stock' => $row['INV_STOCK'],
-                'precio' => $row['INV_PRICE'],
+                'precio' => $row['INV_PRICE_IVA_MARGIN'],
                 'sucursal' => $row['BRAN_CODE']
             );
         }
@@ -71,26 +88,34 @@ if ($post['accion'] == "loadProducto") {
     echo $respuesta;
 }
 
-if ($post['accion'] == "AgregarProducto" || $post['accion'] == "ActualizarProducto") {
+if ($post['accion'] == "guardarProducto" || $post['accion'] == "actualizarProducto") {
     $nombre = $post['nombre'];
     $tipo = $post['tipo'];
     $iva = $post['iva'];
+    $unidad = $post['unidad'];
+    $margen = $post['margen'];
+    $precio_final = $post['precio_final'];
     $imagen = $post['imagen'];
     $stock = $post['stock'];
     $precio = $post['precio'];
     $sucursal = $post['sucursal'];
-
-    if ($post['accion'] == "AgregarProducto") {
+    $categoria = $post['categoria'];
+    
+    if ($post['accion'] == "guardarProducto") {
         $sentencia = sprintf(
-            "INSERT INTO res_inventory (INV_NAME, INV_TYPE, INV_IVA, INV_IMAGE, INV_STOCK, INV_PRICE, BRAN_CODE) 
-            VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s')",
+            "INSERT INTO res_inventory (INV_NAME, INV_TYPE, INV_IVA, INV_MARGIN, INV_IMAGE, INV_UNIT_NAME, INV_STOCK, INV_PRICE, INV_PRICE_IVA_MARGIN, BRAN_CODE, CAT_CODE) 
+            VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s')",
             mysqli_real_escape_string($mysqli, $nombre),
             mysqli_real_escape_string($mysqli, $tipo),
             mysqli_real_escape_string($mysqli, $iva),
+            mysqli_real_escape_string($mysqli, $margen),
             mysqli_real_escape_string($mysqli, $imagen),
+            mysqli_real_escape_string($mysqli, $unidad),
             mysqli_real_escape_string($mysqli, $stock),
             mysqli_real_escape_string($mysqli, $precio),
-            mysqli_real_escape_string($mysqli, $sucursal)
+            mysqli_real_escape_string($mysqli, $precio_final),
+            mysqli_real_escape_string($mysqli, $sucursal),
+            mysqli_real_escape_string($mysqli, $categoria)
         );
     } else {
         $codigo = $post['codigo'];
@@ -99,18 +124,26 @@ if ($post['accion'] == "AgregarProducto" || $post['accion'] == "ActualizarProduc
             INV_NAME='%s', 
             INV_TYPE='%s', 
             INV_IVA='%s', 
+            INV_MARGIN='%s',
             INV_IMAGE='%s', 
+            INV_UNIT_NAME='%s',
             INV_STOCK='%s', 
             INV_PRICE='%s', 
-            BRAN_CODE='%s' 
+            INV_PRICE_IVA_MARGIN='%s',
+            BRAN_CODE='%s',
+            CAT_CODE='%s' 
             WHERE INV_CODE='%s'",
             mysqli_real_escape_string($mysqli, $nombre),
             mysqli_real_escape_string($mysqli, $tipo),
             mysqli_real_escape_string($mysqli, $iva),
+            mysqli_real_escape_string($mysqli, $margen),
             mysqli_real_escape_string($mysqli, $imagen),
+            mysqli_real_escape_string($mysqli, $unidad),
             mysqli_real_escape_string($mysqli, $stock),
             mysqli_real_escape_string($mysqli, $precio),
+            mysqli_real_escape_string($mysqli, $precio_final),
             mysqli_real_escape_string($mysqli, $sucursal),
+            mysqli_real_escape_string($mysqli, $categoria),
             mysqli_real_escape_string($mysqli, $codigo)
         );
     }

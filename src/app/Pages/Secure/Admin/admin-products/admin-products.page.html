@@ -23,7 +23,7 @@
         <h2>{{ producto.nombre }}</h2>
         <p><strong>Precio:</strong> {{ producto.precio | currency }}</p>
         <p><strong>Stock:</strong> {{ producto.stock }}</p>
-        <p><strong>Estado:</strong> {{ producto.estado ? 'Activo' : 'Inactivo' }}</p>
+        <p><strong>Estado:</strong> {{ producto.estado === '1' ? 'Activo' : 'Inactivo' }}</p>
       </ion-label>
       <ion-buttons slot="end" class="action-buttons">
         <ion-button fill="clear" color="primary" (click)="irEditar(producto.codigo)">

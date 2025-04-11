@@ -132,13 +132,20 @@ const routes: Routes = [
   {
     path: 'admin-roles',
     loadChildren: () => import('./Pages/Secure/Admin/admin-roles/admin-roles.module').then( m => m.AdminRolesPageModule)
-  },  {
+  },
+  {
     path: 'edit-admin-products',
     loadChildren: () => import('./Pages/Secure/Admin/edit-admin-products/edit-admin-products.module').then( m => m.EditAdminProductsPageModule)
   },
   {
+
+    path: 'edit-admin-recipes',
+    loadChildren: () => import('./Pages/Secure/Admin/edit-admin-recipes/edit-admin-recipes.module').then( m => m.EditAdminRecipesPageModule)
+  },
+  {
     path: 'admin-order',
     loadChildren: () => import('./Pages/Secure/Admin/admin-order/admin-order.module').then( m => m.AdminOrderPageModule)
+
   },
   {
     path: 'admin-order-products',

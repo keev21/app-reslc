@@ -1,13 +1,38 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>admin-recipes</ion-title>
+    <ion-title>Recetas</ion-title>
+    <ion-buttons slot="start">
+      <ion-button (click)="cancelar()">Menú</ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">admin-recipes</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <ion-item>
+    <ion-input [(ngModel)]="buscarCodigo" placeholder="Buscar por código de producto"></ion-input>
+    <ion-button expand="full" (click)="buscarRecetas()">Buscar</ion-button>
+  </ion-item>
+
+  <ion-list>
+    <ion-item *ngFor="let receta of recetas">
+      <ion-label>
+        <h2>Producto ID: {{ receta.PRO_NAME }}</h2>
+        <p>Estado: {{ receta.REC_STATUS === '1' ? 'Activo' : 'Inactivo' }}</p>
+      </ion-label>
+      <ion-buttons slot="end">
+        <ion-button (click)="irEditar(receta.REC_CODE)">
+          <ion-icon name="create"></ion-icon>
+        </ion-button>
+        <ion-button (click)="eliminar(receta.REC_CODE)">
+          <ion-icon name="trash"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </ion-item>
+  </ion-list>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="nuevo()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
 </ion-content>

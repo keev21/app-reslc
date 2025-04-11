@@ -22,7 +22,7 @@
       <ion-label class="product-info">
         <h2>{{ producto.nombre }}</h2>
         <p><strong>Tipo:</strong> {{ producto.tipo == 1 ? 'Producto' : 'Servicio' }}</p>
-        <p><strong>Precio:</strong> {{ producto.precio | currency }}</p>
+        <p><strong>Precio Venta:</strong> {{ producto.precio | currency }}</p>
         <p><strong>Stock:</strong> {{ producto.stock }}</p>
       </ion-label>
       <ion-buttons slot="end" class="action-buttons">
