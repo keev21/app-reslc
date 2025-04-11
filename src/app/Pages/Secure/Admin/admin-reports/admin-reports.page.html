@@ -1,13 +1,79 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>admin-reports</ion-title>
+    <ion-title>Reportes Administrativos</ion-title>
+    <ion-buttons slot="start">
+      <ion-button (click)="back()">
+        <ion-icon name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">admin-reports</ion-title>
-    </ion-toolbar>
-  </ion-header>
+  <!-- Selector de reportes -->
+  <ion-item>
+    <ion-label position="stacked">Tipo de Reporte</ion-label>
+    <ion-select (ionChange)="onReportSelect($event)" [value]="selectedReport">
+      <ion-select-option value="mostConsumed">Productos más consumidos</ion-select-option>
+      <ion-select-option value="salesByCategory">Ventas por categoría</ion-select-option>
+      <ion-select-option value="bestCustomers">Mejores clientes</ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <!-- Selector de período -->
+  <ion-item>
+    <ion-label position="stacked">Período</ion-label>
+    <ion-select (ionChange)="onPeriodSelect($event)" [value]="selectedPeriod">
+      <ion-select-option value="all">Todos los tiempos</ion-select-option>
+      <ion-select-option value="month">Último mes</ion-select-option>
+      <ion-select-option value="week">Última semana</ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <!-- Gráfico principal -->
+  <div class="chart-container">
+    <canvas #reportChart></canvas>
+  </div>
+
+  <!-- Tabla de datos -->
+  <ion-list *ngIf="reportData && reportData.length > 0">
+    <ion-list-header>
+      <ion-label>{{getReportTitle()}}</ion-label>
+    </ion-list-header>
+    
+    <!-- Productos más consumidos -->
+    <ng-container *ngIf="selectedReport === 'mostConsumed'">
+      <ion-item *ngFor="let item of reportData; let i = index">
+        <ion-label>
+          <h2>#{{i+1}} {{ item.product_name }}</h2>
+          <p>Cantidad: {{ item.quantity | number }}</p>
+          <p>Total vendido: ${{ item.total_sales | number:'1.2-2' }}</p>
+        </ion-label>
+      </ion-item>
+    </ng-container>
+
+    <!-- Ventas por categoría -->
+    <ng-container *ngIf="selectedReport === 'salesByCategory'">
+      <ion-item *ngFor="let item of reportData; let i = index">
+        <ion-label>
+          <h2>#{{i+1}} {{ item.category_name }}</h2>
+          <p>Productos vendidos: {{ item.total_products | number }}</p>
+          <p>Total ventas: ${{ item.total_sales | number:'1.2-2' }}</p>
+        </ion-label>
+        <ion-badge slot="end" color="primary">{{item.percentage | number:'1.1-1'}}%</ion-badge>
+      </ion-item>
+    </ng-container>
+
+    <!-- Mejores clientes -->
+    <ng-container *ngIf="selectedReport === 'bestCustomers'">
+      <ion-item *ngFor="let item of reportData; let i = index">
+        <ion-label>
+          <h2>#{{i+1}} {{ item.customer_name }}</h2>
+          <p>Visitas: {{ item.visits | number }}</p>
+          <p>Total gastado: ${{ item.total_spent | number:'1.2-2' }}</p>
+        </ion-label>
+        <ion-badge slot="end" color="primary">{{item.percentage | number:'1.1-1'}}%</ion-badge>
+      </ion-item>
+    </ng-container>
+  </ion-list>
 </ion-content>
