@@ -1,0 +1,90 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-title>Panel de Cocina</ion-title>
+    <ion-buttons slot="start">
+      <ion-button (click)="cancelar()">
+        <ion-icon name="arrow-back"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <!-- Barra de búsqueda -->
+  <ion-searchbar 
+    [(ngModel)]="buscarProducto" 
+    placeholder="Buscar producto..."
+    (ionChange)="buscarDetalles()"
+    animated
+    class="search-bar"
+  ></ion-searchbar>
+
+  <!-- Lista de pedidos -->
+  <ion-list>
+    <ion-accordion-group expand="inset">
+      <ion-accordion *ngFor="let pedido of pedidosAgrupados" [value]="pedido.ORD_CODE">
+        <ion-item slot="header" [color]="getPedidoColor(pedido)">
+          <ion-label class="pedido-header">
+            <div class="header-top">
+              <h2><strong>Pedido #{{pedido.ORD_CODE}}</strong></h2>
+              <ion-badge [color]="getEstadoColor(obtenerEstadoGeneral(pedido))">
+                {{obtenerEstadoGeneral(pedido)}}
+              </ion-badge>
+            </div>
+            <div class="header-info">
+              <div>
+                <ion-icon name="time"></ion-icon>
+                {{ pedido.ORD_DATE | date: 'shortTime' }}
+              </div>
+              <div>
+                <ion-icon name="restaurant"></ion-icon>
+                Mesa {{ pedido.TAB_NAME }}
+              </div>
+              <div>
+                <ion-icon name="fast-food"></ion-icon>
+                {{ pedido.detalles.length }} ítems
+              </div>
+            </div>
+          </ion-label>
+        </ion-item>
+
+        <div slot="content" class="pedido-content">
+          <!-- Items del pedido -->
+          <ion-list>
+            <ion-item *ngFor="let detalle of pedido.detalles" class="item-detalle">
+              <ion-label>
+                <h3>{{ detalle.INV_NAME }}</h3>
+                <p>Cantidad: {{ detalle.ORDD_QUANTITY }}</p>
+                <ion-badge [color]="getEstadoColor(detalle.ORDD_STATUS)">
+                  {{ detalle.ORDD_STATUS }}
+                </ion-badge>
+              </ion-label>
+              
+              <ion-button 
+                *ngIf="detalle.ORDD_STATUS === 'Pendiente'" 
+                (click)="marcarComoEntregado(detalle, pedido.ORD_CODE)"
+                fill="clear"
+                color="success"
+                class="action-button"
+              >
+                <ion-icon slot="icon-only" name="checkmark-done"></ion-icon>
+              </ion-button>
+            </ion-item>
+          </ion-list>
+
+          <!-- Botón para completar todo el pedido -->
+          <ion-button 
+            expand="block" 
+            color="success" 
+            *ngIf="tieneItemsPendientes(pedido)"
+            (click)="marcarTodoComoEntregado(pedido)"
+            class="completar-button"
+          >
+            <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+            Completar Pedido
+          </ion-button>
+        </div>
+      </ion-accordion>
+    </ion-accordion-group>
+  </ion-list>
+</ion-content>

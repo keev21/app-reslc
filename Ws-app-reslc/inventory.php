@@ -24,7 +24,7 @@ if ($post['accion'] == "cargarSucursales1") {
 
 // Añadir esta función al archivo products.php que ya teníamos
 if ($post['accion'] == "cargarCategorys") {
-    $sentencia = "SELECT * FROM res_category"; // Asumiendo que tienes una tabla de categorías
+    $sentencia = "SELECT * FROM res_category Where CAT_STATUS=1"; // Asumiendo que tienes una tabla de categorías
     $result = mysqli_query($mysqli, $sentencia);
 
     if (mysqli_num_rows($result) > 0) {

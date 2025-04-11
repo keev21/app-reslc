@@ -146,7 +146,11 @@ const routes: Routes = [
     path: 'admin-order',
     loadChildren: () => import('./Pages/Secure/Admin/admin-order/admin-order.module').then( m => m.AdminOrderPageModule)
 
+  },  {
+    path: 'admin-edit-status-order-details',
+    loadChildren: () => import('./Pages/Secure/Admin/admin-edit-status-order-details/admin-edit-status-order-details.module').then( m => m.AdminEditStatusOrderDetailsPageModule)
   },
+
 
  
 ];

@@ -83,9 +83,11 @@ export class HomePage implements OnInit {
   products(){
     this.navCtrl.navigateForward('admin-products');
   }
-
   recipes(){
     this.navCtrl.navigateForward('admin-recipes');
+  }
+  statusorder(){
+    this.navCtrl.navigateForward('admin-edit-status-order-details');
   }
   toggleDarkMode(event: any) {
     this.darkModeToggle = event.detail.checked;
