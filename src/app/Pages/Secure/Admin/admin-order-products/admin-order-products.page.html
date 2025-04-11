@@ -1,0 +1,66 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Seleccionar Productos</ion-title>
+    <ion-buttons slot="start">
+      <ion-button (click)="goBack()">Atrás</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <!-- Barra de búsqueda -->
+  <ion-searchbar 
+    [(ngModel)]="searchTerm" 
+    (ionChange)="onSearchChange($event)"
+    placeholder="Buscar producto..."
+    debounce="500">
+  </ion-searchbar>
+
+  <!-- Selector de categorías -->
+  <ion-item>
+    <ion-label>Categoría:</ion-label>
+    <ion-select 
+      [(ngModel)]="selectedCategory" 
+      (ionChange)="onCategoryChange()"
+      interface="action-sheet">
+      <ion-select-option *ngFor="let cat of categories" [value]="cat.CAT_CODE">
+        {{cat.CAT_NAME}}
+      </ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <!-- Lista de productos -->
+  <ion-list>
+    <div *ngIf="loading" class="loading-spinner">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Cargando productos...</p>
+    </div>
+
+    <ion-item *ngFor="let product of products" class="product-item">
+      <ion-avatar slot="start">
+        <img [src]="getProductImage(product.INV_IMAGE)" alt="{{product.INV_NAME}}">
+      </ion-avatar>
+      
+      <ion-label>
+        <h2>{{product.INV_NAME}}</h2>
+        <p>{{product.INV_DESCRIPTION || 'Sin descripción'}}</p>
+        <p><strong>Precio:</strong> ${{product.INV_PRICE | number:'1.2-2'}}</p>
+        <p><strong>Stock:</strong> {{product.INV_STOCK}} {{product.INV_UNIT_NAME}}</p>
+      </ion-label>
+      
+      <ion-button 
+        slot="end" 
+        fill="solid" 
+        color="primary"
+        (click)="selectProduct(product)">
+        Seleccionar
+      </ion-button>
+    </ion-item>
+
+    <ion-item *ngIf="!loading && products.length === 0">
+      <ion-label class="ion-text-center">
+        No se encontraron productos
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>
