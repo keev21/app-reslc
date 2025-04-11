@@ -76,4 +76,12 @@
       </ion-item>
     </ng-container>
   </ion-list>
+
+      <!-- Botón de exportación -->
+    <ion-button expand="block" (click)="exportToExcel()" [disabled]="!reportData || reportData.length === 0">
+      <ion-icon name="download" slot="start"></ion-icon>
+      Exportar a Excel
+    </ion-button>
 </ion-content>
+
+

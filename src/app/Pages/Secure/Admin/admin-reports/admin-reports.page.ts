@@ -2,6 +2,7 @@ import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { NavController } from '@ionic/angular';
 import { AuthService } from '../../../../Services/auth.service';
 import Chart from 'chart.js/auto';
+import * as XLSX from 'xlsx';
 
 @Component({
   selector: 'app-admin-reports',
@@ -36,6 +37,67 @@ export class AdminReportsPage implements OnInit {
     this.selectedPeriod = event.detail.value;
     this.loadReportData();
   }
+
+  exportToExcel() {
+    if (!this.reportData || this.reportData.length === 0) {
+      this.authService.showToast('No hay datos para exportar');
+      return;
+    }
+  
+    // Preparar los datos según el tipo de reporte
+    let excelData: any[] = [];
+    let fileName = '';
+    const date = new Date().toISOString().split('T')[0];
+  
+    switch (this.selectedReport) {
+      case 'mostConsumed':
+        fileName = `Productos_mas_consumidos_${date}.xlsx`;
+        excelData = this.reportData.map(item => ({
+          'Producto': item.product_name,
+          'Cantidad': Number(item.quantity),
+          'Total Vendido': `$${Number(item.total_sales).toFixed(2)}`
+        }));
+        break;
+  
+      case 'salesByCategory':
+        fileName = `Ventas_por_categoria_${date}.xlsx`;
+        excelData = this.reportData.map(item => ({
+          'Categoría': item.category_name,
+          'Productos Vendidos': Number(item.total_products),
+          'Total Ventas': `$${Number(item.total_sales).toFixed(2)}`,
+          'Porcentaje': `${Number(item.percentage).toFixed(1)}%`
+        }));
+        break;
+  
+      case 'bestCustomers':
+        fileName = `Mejores_clientes_${date}.xlsx`;
+        excelData = this.reportData.map(item => ({
+          'Cliente': item.customer_name,
+          'Visitas': Number(item.visits),
+          'Total Gastado': `$${Number(item.total_spent).toFixed(2)}`,
+          'Porcentaje': `${Number(item.percentage).toFixed(1)}%`
+        }));
+        break;
+    }
+  
+    try {
+      // Crear la hoja de trabajo
+      const ws: XLSX.WorkSheet = XLSX.utils.json_to_sheet(excelData);
+      
+      // Crear el libro de trabajo
+      const wb: XLSX.WorkBook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, 'Reporte');
+      
+      // Generar el archivo Excel
+      XLSX.writeFile(wb, fileName);
+  
+      this.authService.showToast('Reporte exportado exitosamente');
+    } catch (error) {
+      console.error('Error al exportar a Excel:', error);
+      this.authService.showToast('Error al exportar el reporte');
+    }
+  }
+
 
   getReportTitle(): string {
     const titles = {
