@@ -13,15 +13,25 @@ export class AdminEditStatusOrderDetailsPage implements OnInit {
   detalles: any[] = [];
   pedidosAgrupados: any[] = [];
   buscarProducto: string = '';
+  mostrarEntregados: boolean = false; // Nueva propiedad para controlar el estado
+  branch: string = '';
+  constructor(public servicio: AuthService, public navCtrl: NavController) {
 
-  constructor(public servicio: AuthService, public navCtrl: NavController) {}
+    this.servicio.getSession('BRAN_CODE').then((res: any) => {
+      this.branch = res;
+      console.log('Branch:', this.branch);
+    });
+  }
 
   ngOnInit() {
     this.cargarDetalles();
   }
 
   cargarDetalles() {
-    const datos = { accion: 'consultarDetallesPedido' };
+    const datos = { 
+      accion: this.mostrarEntregados ? 'consultarDetallesPedido2' : 'consultarDetallesPedido' 
+    };
+    console.log("datos enviado",datos),
     this.servicio.postData(datos).subscribe(
       (res: any) => {
         if (res.estado === true) {
@@ -35,6 +45,12 @@ export class AdminEditStatusOrderDetailsPage implements OnInit {
         console.error('Error al cargar los detalles:', error);
       }
     );
+  }
+
+  // Función para alternar entre pedidos pendientes y entregados
+  togglePedidosEntregados() {
+    this.mostrarEntregados = !this.mostrarEntregados;
+    this.cargarDetalles();
   }
 
 
