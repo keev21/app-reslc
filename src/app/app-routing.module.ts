@@ -158,7 +158,11 @@ const routes: Routes = [
   {
     path: 'admin-payment',
     loadChildren: () => import('./Pages/Secure/Admin/admin-payment/admin-payment.module').then( m => m.AdminPaymentPageModule)
+  },  {
+    path: 'admin-reports',
+    loadChildren: () => import('./Pages/Secure/Admin/admin-reports/admin-reports.module').then( m => m.AdminReportsPageModule)
   },
+
 
  
 ];
