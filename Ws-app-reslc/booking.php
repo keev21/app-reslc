@@ -247,50 +247,73 @@ if ($post['accion'] == "eliminarReserva") {
 if ($post['accion'] == "verificarOrdenReserva") {
     $boo_code = mysqli_real_escape_string($mysqli, $post['boo_code']);
     
-    $sql = "SELECT ORD_CODE FROM res_order WHERE BOO_CODE = '$boo_code' LIMIT 1";
+    $sql = "SELECT ORD_CODE, BOO_CODE FROM res_order 
+            WHERE BOO_CODE = '$boo_code' LIMIT 1";
+    
     $result = mysqli_query($mysqli, $sql);
     
     if (mysqli_num_rows($result) > 0) {
         $orden = mysqli_fetch_assoc($result);
-        echo json_encode(['estado' => true, 'ord_code' => $orden['ORD_CODE']]);
+        echo json_encode([
+            'estado' => true, 
+            'ord_code' => $orden['ORD_CODE'],
+            'boo_code' => $orden['BOO_CODE']
+        ]);
     } else {
         echo json_encode(['estado' => false]);
     }
     exit;
 }
-
+// Crear una nueva orden para una reserva
 if ($post['accion'] == "crearOrdenReserva") {
     $boo_code = mysqli_real_escape_string($mysqli, $post['boo_code']);
-    $ord_date = date('Y-m-d H:i:s');
-    $ord_status = '0'; // 0 = Activa, 1 = Finalizada, etc.
-    $ord_total = '0.00';
     
     // Iniciar transacción
     mysqli_begin_transaction($mysqli);
     
     try {
-        $sql = "INSERT INTO res_order (BOO_CODE, ORD_DATE, ORD_STATUS, ORD_TOTAL)
-                VALUES ('$boo_code', '$ord_date', '$ord_status', '$ord_total')";
+        $sql = "INSERT INTO res_order (
+                BOO_CODE, 
+                ORD_DATE, 
+                ORD_STATUS, 
+                ORD_TOTAL,
+                ORD_PAYMENT,
+                ORD_PAYMENT_ID,
+                ORD_IMAGE
+            ) VALUES (
+                '$boo_code',
+                NOW(),  -- Fecha actual
+                '0',    -- Estado inicial (0 = activa)
+                '0.00', -- Total inicial
+                'Efectivo',    -- Método de pago (0 = no definido)
+                '0',     -- ID de pago (vacío inicialmente)
+                '0'      -- Imagen (vacía inicialmente)
+            )";
         
         if (!mysqli_query($mysqli, $sql)) {
             throw new Exception('Error al crear la orden: ' . mysqli_error($mysqli));
         }
         
-        // Obtenemos el ID de la orden recién insertada (ORD_CODE que es autoincremental)
+        // Obtenemos el ID de la orden recién insertada
         $ord_code = mysqli_insert_id($mysqli);
         
         // Confirmar la transacción
         mysqli_commit($mysqli);
+        
         echo json_encode([
             'estado' => true, 
-            'ord_code' => $ord_code, // Este es el ID autoincremental
+            'ord_code' => $ord_code,
+            'boo_code' => $boo_code,
             'mensaje' => 'Orden creada correctamente'
         ]);
         
     } catch (Exception $e) {
         // Revertir la transacción en caso de error
         mysqli_rollback($mysqli);
-        echo json_encode(['estado' => false, 'mensaje' => $e->getMessage()]);
+        echo json_encode([
+            'estado' => false, 
+            'mensaje' => $e->getMessage()
+        ]);
     }
     exit;
 }

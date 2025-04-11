@@ -145,10 +145,27 @@ const routes: Routes = [
   {
     path: 'admin-order',
     loadChildren: () => import('./Pages/Secure/Admin/admin-order/admin-order.module').then( m => m.AdminOrderPageModule)
-
-  },  {
+  },
+  {
     path: 'admin-edit-status-order-details',
     loadChildren: () => import('./Pages/Secure/Admin/admin-edit-status-order-details/admin-edit-status-order-details.module').then( m => m.AdminEditStatusOrderDetailsPageModule)
+
+  },
+  {
+    path: 'admin-order-products',
+    loadChildren: () => import('./Pages/Secure/Admin/admin-order-products/admin-order-products.module').then( m => m.AdminOrderProductsPageModule)
+  },
+  {
+    path: 'admin-order-details',
+    loadChildren: () => import('./Pages/Secure/Admin/admin-order-details/admin-order-details.module').then( m => m.AdminOrderDetailsPageModule)
+  },
+  {
+    path: 'admin-payment',
+    loadChildren: () => import('./Pages/Secure/Admin/admin-payment/admin-payment.module').then( m => m.AdminPaymentPageModule)
+  },
+  {
+    path: 'admin-reports',
+    loadChildren: () => import('./Pages/Secure/Admin/admin-reports/admin-reports.module').then( m => m.AdminReportsPageModule)
   },
 
 

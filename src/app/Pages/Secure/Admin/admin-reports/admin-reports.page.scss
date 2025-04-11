@@ -1,0 +1,38 @@
+/* admin-reports.page.scss */
+.chart-container {
+    position: relative;
+    margin: 16px auto;
+    height: 300px;
+    width: 100%;
+    padding: 16px;
+    background: rgb(52, 51, 51);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+  
+  ion-select {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  
+  ion-list {
+    margin-top: 16px;
+    background: transparent;
+  }
+  
+  ion-item {
+    --background: rgb(31, 30, 30);
+    margin-bottom: 8px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  
+  ion-badge {
+    font-size: 14px;
+  }
+  
+  .loading-spinner {
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+  }
